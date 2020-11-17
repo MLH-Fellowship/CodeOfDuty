@@ -101,7 +101,7 @@
                 {
                     "issue_url": "https://github.com/MLH-Fellowship/CodeOfDuty/issues/1",   // link to the issue on GitHub
                     "pr_url": "https://github.com/MLH-Fellowship/CodeOfDuty/pull/4",    // link to the PR that closes the issue on GitHub
-                    "task_status": "open",           // one of ['unassigned', 'assigned', 'under-review', 'completed']
+                    "task_status": "under-review",           // one of ['unassigned', 'assigned', 'under-review', 'completed']
                     "contributor": "ajwad-shaikh",  // contributor assigned
                     "reviewer": "vrusti-mody",      // reviewer assigned       
                     "task_points": "50",        // total points at stake on the task
