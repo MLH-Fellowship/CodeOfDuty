@@ -35,8 +35,8 @@
             ```
             [
                 {
-                    "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",             // Name of the Sprint
+                    "sprint_object": "542c2b97bac0595474108b48",                // Sprint Object Id  
+                    "sprint_name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
                     "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
                 }
             ]
@@ -100,11 +100,11 @@
             [
                 {
                     "issue_url": "https://github.com/MLH-Fellowship/CodeOfDuty/issues/1",   // link to the issue on GitHub
-                    "pr_url": "https://github.com/MLH-Fellowship/CodeOfDuty/pull/4",    // link to the PR that closes the issue on GitHub
-                    "task_status": "under-review",           // one of ['unassigned', 'assigned', 'under-review', 'completed']
+                    "pr_url": "https://github.com/MLH-Fellowship/CodeOfDuty/pull/4",        // link to the PR that closes the issue on GitHub
+                    "task_status": "under-review",  // one of ['unassigned', 'assigned', 'under-review', 'completed']
                     "contributor": "ajwad-shaikh",  // contributor assigned
                     "reviewer": "vrusti-mody",      // reviewer assigned       
-                    "task_points": "50",        // total points at stake on the task
+                    "task_points": "50",            // total points at stake on the task
                     "contributor_points": "40",
                     "reviewer_points": "10"
                 }
@@ -119,4 +119,6 @@
     - `victory_threshold` - Constant in [0,1] that is multiplied to max health to determine the victory threshold for the team
         - Type: Number
         - Example: `0.9` implies that the team would win if 90% of BOSS HP is claimed by the players
-
+    - `due_date` - Sprint Due Date
+        - Type: Date `ISO String`
+        - Example: `Date("2021-03-25T12:00:00Z")`
