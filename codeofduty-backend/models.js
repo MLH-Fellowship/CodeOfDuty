@@ -46,6 +46,7 @@ const sprintSchema = new mongoose.Schema({
   boss_hp: Number,
   boss_hp_max: Number,
   victory_threshold: Number,
+  due_date: Date,
 });
 
 const Repo = mongoose.model("Repo", repoSchema);
