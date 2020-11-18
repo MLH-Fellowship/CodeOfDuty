@@ -9,18 +9,18 @@
 
 - repositories (Collection)
     - `_id` - Repository ID
-        - Type: String `"owner/repo"`
+        - Type: String `"{owner}/{repo}"`
         - Example: `"MLH-Fellowship/CodeOfDuty"`
     - `repo_url` - Link to the repo page on the app
-        - Type: String
-        - Example: `"https://codeofduty.com/owner/repo"` 
+        - Type: String 
+        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty"` 
     - `maintainers` - Maintainers for a repo
         - Type: Array[String] `github-usernames`
         - Example: `["cqvu", "ajwad-shaikh", "vrusti-mody"]`
     - `past_sprints` - Tracked Past Sprints for a repo
         - Type: Array[Sprint Overview]
         - Example:
-            ```json
+            ```
             [
                 {
                     "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
@@ -32,11 +32,11 @@
     - `active_sprints` - Tracks Active Sprints for a repo
         - Type: Array[Sprint Overview]
         - Example:
-            ```json
+            ```
             [
                 {
                     "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",     // Name of the Sprint
+                    "sprint_name": "Sprint 5 | v1.2.2",             // Name of the Sprint
                     "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
                 }
             ]
@@ -44,7 +44,7 @@
     - `contributors` - Contributors Leaderboard in the repo
         - Type: Array[Contributor]
         - Example:
-            ```json
+            ```
             [
                 {
                     "user": "cqvu",         // github username,
@@ -72,14 +72,14 @@
         - Example: `"Sprint 5 | v1.2.2"`
     - `sprint_url` - Link to the Sprint Page on the app
         - Type: String
-        - Example: `"https://codeofduty.com/owner/repo/10"`
+        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty/10"`
     - `milestone_url` - Link to the GitHub Milestone that the Sprint Tracks
         - Type: String
         - Example: `"https://github.com/MLH-Fellowship/CodeOfDuty/milestone/1"`
     - `contributors` - Contributors participating in the Sprint
         - Type: Array[Contributor]
         - Example:
-            ```json
+            ```
             [
                 {
                     "user": "cqvu",         // github username,
@@ -96,7 +96,7 @@
     - `tasks` - Tasks taken up in the Sprint
         - Type: Array[Task]
         - Example:
-            ```json
+            ```
             [
                 {
                     "issue_url": "https://github.com/MLH-Fellowship/CodeOfDuty/issues/1",   // link to the issue on GitHub
