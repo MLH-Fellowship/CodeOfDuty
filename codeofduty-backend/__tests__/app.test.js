@@ -8,3 +8,10 @@ describe("GET / ", () => {
       expect(response.body.message).toBe('hello world!')
     });
 });
+
+describe("GET /repo ", () => {
+  test("Repo Model Sample Test", async () => {
+    const response = await request(app).get("/repo");
+    expect(response.statusCode).toBe(200);
+  });
+});
