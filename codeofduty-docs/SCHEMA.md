@@ -110,4 +110,13 @@
                 }
             ]
             ```
+    - `boss_hp` - Remaining Health Points (HP) of the BOSS enemy
+        - Type: Number
+        - Example: `250`
+    - `boss_hp_max` - Maximum HP of the BOSS Enemy
+        - Type: Number
+        - Example: `550`
+    - `victory_threshold` - Constant in [0,1] that is multiplied to max health to determine the victory threshold for the team
+        - Type: Number
+        - Example: `0.9` implies that the team would win if 90% of BOSS HP is claimed by the players
 

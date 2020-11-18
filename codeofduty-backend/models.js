@@ -43,7 +43,8 @@ const sprintSchema = new mongoose.Schema({
   milestone_url: String,
   contributors: [sprintLevelContributorSchema],
   tasks: [taskSchema],
-  boss_health: Number,
+  boss_hp: Number,
+  boss_hp_max: Number,
   victory_threshold: Number,
 });
 
