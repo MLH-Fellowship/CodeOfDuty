@@ -1,14 +1,20 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
+const request =require('supertest');
 const databaseName = 'test'
+const app = require('../app')
 
 beforeAll(async () => {
-    const uri = require('./config').ATLAS_URI+`${databaseName}`
-  await mongoose.connect(url, { useNewUrlParser: true })
+    const uri = process.env.ATLAS_URI+`${databaseName}`
+  await mongoose.connect(uri, { useNewUrlParser: true })
 })
 
-it('Should return sprints of a user', async done => {
+it('Should return sprints of a user', async () => {
     // Sends request...
-    const res = await request.get('/fetchSprints/vrushti-mody')
-    expect(res).toBeTruthy()
-    done()
+    const user= await request(app).get('/fetchSprints?user=vrushti-mody')
+    
+      expect(user).toBeTruthy()
+      
+     
+   
   })

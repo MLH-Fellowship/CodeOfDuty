@@ -5,13 +5,13 @@ Response object: Array of sprints
 
 Example:
 
-Request url: 'https://codeofduty.com/fetchSprints/vrushti-mody'
+Request url: 'https://codeofduty.com/fetchSprints'
 
 Response object:
 ```
 [
     {
-        repo: 'Code-of-Duty',
+        repo: 'CodeOfDuty',
         name: 'COD',
         sprint_url: 'https://github.com/MLHFellowship/Code-of-Duty',
         milestone_url: 'https://github.com/MLHFellowship/Code-of-Duty/milestone/1',

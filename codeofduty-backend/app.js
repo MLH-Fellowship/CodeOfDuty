@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-const Repo = require('./models')
+const models = require('./models')
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -12,10 +12,10 @@ app.get("/", (req, res) => {
     res.json({message: 'hello world!'})
 });
 
-app.get("/fetchSprints/:user", (req, res) => {
-    const user = req.params.user;
-    Repo.find({"contributors.user":user}).sort({due_date: 'desc'}).exec(function(err, docs) { 
-        return docs;
+app.get("/fetchSprints", (req, res) => {
+    const user = req.query.user;
+    models.Repo.find({"contributors.user":user}).sort({due_date: 'desc'}).exec(function(err, docs) { 
+        return res.send(docs);
      });
 });
 
