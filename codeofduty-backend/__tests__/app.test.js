@@ -9,3 +9,12 @@ describe("GET / ", () => {
     });
 });
 
+<<<<<<< HEAD
+=======
+describe("GET /repo ", () => {
+  test("Repo Model Sample Test", async () => {
+    const response = await request(app).get("/repo");
+    expect(response.statusCode).toBe(200);
+  });
+});
+>>>>>>> 2ac3dc1a4f37775068c36533cfbab13224191ed4
