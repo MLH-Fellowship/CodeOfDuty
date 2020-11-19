@@ -1,0 +1,46 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Test Frontend
+      env:
+        REACT_APP_REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+        REACT_APP_OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+        REACT_APP_OAUTH_SCOPES: ${{ secrets.OAUTH_SCOPES }}
+      run: |
+        cd codeofduty-frontend
+        npm install
+        npm test
+        cd ..
+    - name: Test Backend
+      env:
+        ATLAS_URI: ${{ secrets.ATLAS_URI }}
+        OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+        OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+      run: |
+        cd codeofduty-backend
+        npm install
+        npm test
+        cd ..    
+        
