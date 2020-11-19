@@ -2,8 +2,6 @@ import { render, screen } from '@testing-library/react';
 
 import App from './App';
 
-jest.mock('axios');
-
 describe('App', () => {
   test("renders welcome message and log in button", async () => {
     render(<App />);
