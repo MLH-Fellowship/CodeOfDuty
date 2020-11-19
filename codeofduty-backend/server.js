@@ -1,8 +1,9 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 require("dotenv").config();
+
 // Server listening on port
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 
 // Uri to connect mongodb
 const uri = process.env.ATLAS_URI;
