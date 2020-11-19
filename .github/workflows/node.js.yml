@@ -30,6 +30,8 @@ jobs:
         npm test
         cd ..
     - name: Test Backend
+      env:
+        ATLAS_URI: ${{ secrets.ATLAS_URI }}
       run: |
         cd codeofduty-backend
         npm install
