@@ -1,8 +1,8 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const request = require('superagent');
-require('dotenv').config()
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const request = require("superagent");
+require("dotenv").config()
 
 const app = express();
 const models = require("./models");
@@ -12,41 +12,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-    res.json({message: 'hello world!'})
+    res.json({message: "hello world!"})
 });
-
-app.get("/repo", (req, res) => {
-    const sampleRepo = new models.Repo({
-      _id: "owner/repo",
-      repo_url: "https://codeofduty.com/owner/repo",
-      maintainers: ["cqvu", "ajwad-shaikh", "vrusti-mody"],
-      past_sprints: [
-        {
-          sprint_object: "542c2b97bac0595474108b48",
-          sprint_name: "Sprint 5 | v1.2.2",
-          sprint_url: "https://codeofduty.com/owner/repo/10",
-        },
-      ],
-      active_sprints: [
-        {
-          sprint_object: "542c2b97bac0595474108b48",
-          sprint_name: "Sprint 6 | v1.3.2",
-          sprint_url: "https://codeofduty.com/owner/repo/12",
-        },
-      ],
-      contributors: [
-        {
-          user: "cqvu",
-          points_claimed: 20,
-        },
-        {
-          user: "ajwad-shaikh",
-          points_claimed: 10,
-        },
-      ],
-    });
-    res.status(200).json(sampleRepo);
-  });
 
 app.get("/authenticate", async (req, res) => {
     const { code } = req.query;
@@ -62,10 +29,10 @@ app.get("/authenticate", async (req, res) => {
 
 async function getUser(token) {
     return await request
-        .get('https://api.github.com/user')
-        .set('Authorization', `token ${token}`)
-        .set('User-Agent', 'CodeOfDuty')
-        .set('Accept', 'application/json')
+        .get("https://api.github.com/user")
+        .set("Authorization", `token ${token}`)
+        .set("User-Agent", "CodeOfDuty")
+        .set("Accept", "application/json")
         .then(result => {
             const userBody = result.body;
             return userBody;
@@ -77,17 +44,34 @@ async function getUser(token) {
 
 async function getAccessToken(code) {
     return await request
-        .post('https://github.com/login/oauth/access_token')
+        .post("https://github.com/login/oauth/access_token")
         .send({
             client_id: process.env.OAUTH_CLIENT_ID,
             client_secret: process.env.OAUTH_CLIENT_SECRET,
             code: code
         })
-        .set('Accept', 'application/json')
+        .set("Accept", "application/json")
         .then(res => {
             const { access_token } = res.body;
             return access_token;
         })
 }
+app.get("/fetchUserSprints", (req, res) => {
+  const user = req.query.user;
+  models.Sprint.find({ "contributors.user": user })
+    .sort({ due_date: "desc" })
+    .exec(function (err, docs) {
+      return res.send(docs);
+    });
+});
+
+app.get("/fetchGlobalSprints", (req, res) => {
+  models.Sprint.find()
+    .sort({ due_date: "desc" })
+    .limit(10)
+    .exec(function (err, docs) {
+      return res.send(docs);
+    });
+});
 
 module.exports = app;
