@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const request = require('superagent');
-const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = require('./config');
+require('dotenv').config()
 
 const app = express();
 const models = require("./models");
@@ -79,8 +79,8 @@ async function getAccessToken(code) {
     return await request
         .post('https://github.com/login/oauth/access_token')
         .send({
-            client_id: OAUTH_CLIENT_ID,
-            client_secret: OAUTH_CLIENT_SECRET,
+            client_id: process.env.OAUTH_CLIENT_ID,
+            client_secret: process.env.OAUTH_CLIENT_SECRET,
             code: code
         })
         .set('Accept', 'application/json')
