@@ -21,4 +21,12 @@ app.get("/fetchSprints", (req, res) => {
     });
 });
 
+app.get("/fetchAllSprints", (req, res) => {
+  models.Repo.find()
+    .sort({ due_date: "desc" })
+    .exec(function (err, docs) {
+      return res.send(docs.slice(0,10));
+    });
+});
+
 module.exports = app;
