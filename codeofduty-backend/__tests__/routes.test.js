@@ -15,15 +15,16 @@ beforeAll(async (done) => {
 
 it("Should return sprints of a user", async (done) => {
   // Sends request...
-  const user = await request(app).get("/fetchSprints?user=vrushti-mody");
-  expect(user).toBeTruthy();
+  const userSprints = await request(app).get("/fetchUserSprints?user=vrushti-mody");
+  expect(userSprints).toBeTruthy();
   done();
 });
 
 it("Should return all sprints (Top 10)", async (done) => {
   // Sends request...
-  const user = await request(app).get("/fetchAllSprints");
-  expect(user).toBeTruthy();
+  const topSprints = await request(app).get("/fetchGlobalSprints");
+  expect(topSprints).toBeTruthy();
+  expect(topSprints)
   done();
 });
 

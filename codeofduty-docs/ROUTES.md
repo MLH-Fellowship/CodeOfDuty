@@ -1,11 +1,11 @@
-### Route: "/fetchSprints/:user"
+### Route: "/fetchUserSprints/:user"
 
 Request object: Username 
 Response object: Array of sprints
 
 Example:
 
-Request url: 'https://codeofduty.com/fetchSprints'
+Request url: 'https://codeofduty.com/fetchUserSprints'
 
 Response object:
 ```

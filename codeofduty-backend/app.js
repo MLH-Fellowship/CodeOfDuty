@@ -12,20 +12,21 @@ app.get("/", (req, res) => {
   res.json({ message: "hello world!" });
 });
 
-app.get("/fetchSprints", (req, res) => {
+app.get("/fetchUserSprints", (req, res) => {
   const user = req.query.user;
-  models.Repo.find({ "contributors.user": user })
+  models.Sprint.find({ "contributors.user": user })
     .sort({ due_date: "desc" })
     .exec(function (err, docs) {
       return res.send(docs);
     });
 });
 
-app.get("/fetchAllSprints", (req, res) => {
-  models.Repo.find()
+app.get("/fetchGlobalSprints", (req, res) => {
+  models.Sprint.find()
     .sort({ due_date: "desc" })
+    .limit(10)
     .exec(function (err, docs) {
-      return res.send(docs.slice(0,10));
+      return res.send(docs);
     });
 });
 
