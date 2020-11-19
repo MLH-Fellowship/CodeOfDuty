@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { withStyles, CssBaseline, Typography, Grid, Paper, Button } from '@material-ui/core';
 
 const STATUS = {
     INITIAL: "initial",
@@ -7,9 +8,53 @@ const STATUS = {
     AUTHENTICATED: "authenticated"
 };
 
+const style = (theme) => ({
+    root: {
+        height: '95vh',
+        width: '95vw',
+    },
+    header: {
+        marginTop: 20,
+        marginBottom: 20,
+        marginRight: 10,
+        display: 'inline-block'
+    },
+    sub: {
+        marginBottom: 10,
+    },
+    paper: {
+        margin: theme.spacing(2, 4),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%'
+    },
+    menu: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '100%',
+    },
+    menuItem: {
+        padding: '0 2.5% 0 2.5%'
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 10,
+        overflow: 'hidden',
+    },
+    player: {
+        width: '60%'
+    },
+    permalink: {
+        cursor: 'pointer',
+        paddingRight: '5%'
+    }
+});
+
 class Home extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             loggedInUser: 'warrior',
             status: STATUS.INITIAL,
@@ -34,20 +79,41 @@ class Home extends React.Component {
                     });
                 })
         }
-      }
+    }
 
     render() {
+        const { classes } = this.props;
+        const { loggedInUser, status } = this.state;
         return (
-            <React.Fragment>
-                <h1>Welcome, {this.state.loggedInUser}!</h1>
-                <a
-                    style={{
-                        display: this.state.status === STATUS.INITIAL ? "inline" : "none"
-                    }}
-                    href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}
-                >
-                    Login
-                </a>
+            <React.Fragment component="main" className={classes.root}>
+                <CssBaseline />
+                <div className={classes.paper}>
+                    <span>
+                        <Typography className={classes.header} variant="h2" center="center">
+                            Code Of Duty
+                        </Typography>
+                    </span>
+                    <Typography className={classes.sub} variant="h5" align="center">
+                        Gamifying Agile Sprints | Making Open Source Contributions Fun!
+                    </Typography>
+                </div>
+                <Grid container component="main" className={classes.menu}>
+                    <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
+                        Global View
+                    </Grid>
+                    <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
+                        <Typography className={classes.sub} variant="h4" align="center">
+                            Welcome to the battlefield, {loggedInUser}!
+                        </Typography>
+                        {status === STATUS.INITIAL && (<Button 
+                            variant="contained" 
+                            color="primary" 
+                            href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}>
+                            Login with GitHub
+                        </Button>)}
+                    </Grid>
+                </Grid>
+                
             </React.Fragment>
         )
     }
@@ -55,4 +121,4 @@ class Home extends React.Component {
 
 
 
-export default Home;
+export default (withStyles(style)(Home));
