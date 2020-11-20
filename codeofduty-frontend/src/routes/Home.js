@@ -126,7 +126,6 @@ class Home extends React.Component {
   render() {
     const { classes } = this.props;
 
-    // eslint-disable-next-line no-unused-vars
     const { loggedInUser, status, globalSprints, userSprints } = this.state;
     return (
       <div className={classes.root}>
