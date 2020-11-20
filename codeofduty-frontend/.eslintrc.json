@@ -24,7 +24,7 @@
         "react/jsx-filename-extension": [1, {
         "extensions": [".js", ".jsx"]}
         ],
-        "prettier/prettier": ["error", {
+        "prettier/prettier": ["warn", {
            "endOfLine":"auto"
         }],
         "react/prop-types": 0

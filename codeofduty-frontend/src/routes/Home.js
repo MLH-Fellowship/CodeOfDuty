@@ -7,6 +7,7 @@ import {
   Grid,
   Button,
 } from "@material-ui/core";
+import SprintsTable from "../components/SprintsTable";
 
 const STATUS = {
   INITIAL: "initial",
@@ -86,15 +87,37 @@ class Home extends React.Component {
             loggedInUser: user.login,
             status: STATUS.AUTHENTICATED,
           });
+          this.fetchUserSprints(user.login);
         });
     }
+    this.fetchGlobalSprints();
+  }
+
+  async fetchGlobalSprints() {
+    await axios.get("http://localhost:5000/fetchGlobalSprints").then((res) => {
+      this.setState({
+        globalSprints: res.data,
+      });
+    });
+  }
+
+  async fetchUserSprints(loggedInUser) {
+    await axios
+      .get(`http://localhost:5000/fetchUserSprints?user=${loggedInUser}`)
+      .then((res) => {
+        this.setState({
+          userSprints: res.data,
+        });
+      });
   }
 
   render() {
     const { classes } = this.props;
-    const { loggedInUser, status } = this.state;
+
+    // eslint-disable-next-line no-unused-vars
+    const { loggedInUser, status, globalSprints, userSprints } = this.state;
     return (
-      <React.Fragment component="main" className={classes.root}>
+      <div className={classes.root}>
         <CssBaseline />
         <div className={classes.paper}>
           <span>
@@ -108,12 +131,14 @@ class Home extends React.Component {
         </div>
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
-            Global View
+            <Typography className={classes.sub} variant="h4" align="center">
+              Top Global Active Sprints
+            </Typography>
+            <SprintsTable sprintData={globalSprints} />
           </Grid>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
             <Typography className={classes.sub} variant="h4" align="center">
-              Welcome to the battlefield,
-              {loggedInUser}
+              {`Welcome, ${loggedInUser}!`}
             </Typography>
             {status === STATUS.INITIAL && (
               <Button
@@ -124,9 +149,12 @@ class Home extends React.Component {
                 Login with GitHub
               </Button>
             )}
+            {status === STATUS.AUTHENTICATED && (
+              <SprintsTable sprintData={userSprints} />
+            )}
           </Grid>
         </Grid>
-      </React.Fragment>
+      </div>
     );
   }
 }
