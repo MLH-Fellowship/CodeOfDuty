@@ -13,6 +13,7 @@ class Home extends React.Component {
     this.state = {
       loggedInUser: "warrior",
       status: STATUS.INITIAL,
+      // eslint-disable-next-line react/no-unused-state
       token: null,
     };
   }
@@ -29,6 +30,7 @@ class Home extends React.Component {
         .then((res) => {
           const { token, user } = res.data;
           this.setState({
+            // eslint-disable-next-line react/no-unused-state
             token,
             loggedInUser: user.login,
             status: STATUS.AUTHENTICATED,

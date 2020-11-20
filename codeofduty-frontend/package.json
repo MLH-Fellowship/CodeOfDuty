@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ignore-path .gitignore .",
-    "prepush": "npm run lint && npm test"
+    "prepush": "npm run lint -- --fix && npm test"
   },
   "eslintConfig": {
     "extends": [
