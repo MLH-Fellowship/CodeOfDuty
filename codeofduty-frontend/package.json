@@ -16,10 +16,14 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test a",
     "eject": "react-scripts eject",
-    "lint": "eslint --ignore-path .gitignore .",
-    "prepush": "npm run lint -- --fix && npm test"
+    "lint": "eslint --ignore-path .gitignore ."
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "(cd ../codeofduty-backend && npm run lint && CI=true npm test) && (cd ../codeofduty-frontend && npm run lint && CI=true npm test)"
+    }
   },
   "eslintConfig": {
     "extends": [

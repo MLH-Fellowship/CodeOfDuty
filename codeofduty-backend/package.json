@@ -6,8 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "nodemon server.js",
-    "lint": "eslint --ignore-path .gitignore .",
-    "prepush": "npm run lint -- --fix && npm test"
+    "lint": "eslint --ignore-path .gitignore ."
   },
   "author": "",
   "license": "ISC",
