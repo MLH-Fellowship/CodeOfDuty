@@ -7,6 +7,8 @@ import {
   Grid,
   Button,
 } from "@material-ui/core";
+import GitHubIcon from "@material-ui/icons/GitHub";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SprintsTable from "../components/SprintsTable";
 
 const STATUS = {
@@ -29,6 +31,14 @@ const style = (theme) => ({
   sub: {
     marginBottom: 10,
   },
+  centerLeft: {
+    marginLeft: "20%",
+  },
+  floatButton: {
+    marginRight: 0,
+    marginLeft: "auto",
+    textTransform: "none",
+  },
   paper: {
     margin: theme.spacing(2, 4),
     display: "flex",
@@ -45,13 +55,13 @@ const style = (theme) => ({
   menuItem: {
     padding: "0 2.5% 0 2.5%",
   },
-  footer: {
-    position: "absolute",
-    bottom: 10,
-    overflow: "hidden",
+  flexbox: {
+    display: "flex",
+    flexDirection: "row",
   },
-  player: {
-    width: "60%",
+  buttonLogin: {
+    marginTop: 20,
+    textTransform: "none",
   },
   permalink: {
     cursor: "pointer",
@@ -142,15 +152,37 @@ class Home extends React.Component {
             </Typography>
             {status === STATUS.INITIAL && (
               <Button
+                className={classes.buttonLogin}
                 variant="contained"
                 color="primary"
+                startIcon={<GitHubIcon />}
                 href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}
               >
                 Login with GitHub
               </Button>
             )}
             {status === STATUS.AUTHENTICATED && (
-              <SprintsTable sprintData={userSprints} />
+              <div>
+                <div className={classes.flexbox}>
+                  <Typography
+                    className={classes.centerLeft}
+                    variant="h5"
+                    align="center"
+                  >
+                    Your Active Sprints
+                  </Typography>
+                  <Button
+                    className={classes.floatButton}
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddCircleIcon />}
+                    href="/createSprint"
+                  >
+                    Create New Sprint
+                  </Button>
+                </div>
+                <SprintsTable sprintData={userSprints} />
+              </div>
             )}
           </Grid>
         </Grid>

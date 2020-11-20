@@ -12,7 +12,7 @@ import React from "react";
 
 const style = {
   table: {
-    marginTop: 50,
+    marginTop: 25,
     minWidth: 200,
   },
 };
