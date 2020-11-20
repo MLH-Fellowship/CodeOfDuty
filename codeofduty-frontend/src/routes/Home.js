@@ -90,14 +90,16 @@ class Home extends React.Component {
       axios
         .get(`http://127.0.0.1:5000/authenticate?code=${code}`)
         .then((res) => {
-          const { token, user } = res.data;
-          this.setState({
-            // eslint-disable-next-line react/no-unused-state
-            token,
-            loggedInUser: user.login,
-            status: STATUS.AUTHENTICATED,
-          });
-          this.fetchUserSprints(user.login);
+          if (res.status === 200) {
+            const { token, user } = res.data;
+            this.setState({
+              // eslint-disable-next-line react/no-unused-state
+              token,
+              loggedInUser: user.login,
+              status: STATUS.AUTHENTICATED,
+            });
+            this.fetchUserSprints(user.login);
+          }
         });
     }
     this.fetchGlobalSprints();
@@ -150,7 +152,7 @@ class Home extends React.Component {
             <Typography className={classes.sub} variant="h4" align="center">
               {`Welcome, ${loggedInUser}!`}
             </Typography>
-            {status === STATUS.INITIAL && (
+            {status !== STATUS.AUTHENTICATED && (
               <Button
                 className={classes.buttonLogin}
                 variant="contained"
