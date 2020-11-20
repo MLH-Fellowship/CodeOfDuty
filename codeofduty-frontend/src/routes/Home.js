@@ -28,13 +28,15 @@ class Home extends React.Component {
       axios
         .get(`http://127.0.0.1:5000/authenticate?code=${code}`)
         .then((res) => {
-          const { token, user } = res.data;
-          this.setState({
-            // eslint-disable-next-line react/no-unused-state
-            token,
-            loggedInUser: user.login,
-            status: STATUS.AUTHENTICATED,
-          });
+          if (res.status === 200) {
+            const { token, user } = res.data;
+            this.setState({
+              // eslint-disable-next-line react/no-unused-state
+              token,
+              loggedInUser: user.login,
+              status: STATUS.AUTHENTICATED,
+            });
+          }
         });
     }
   }
@@ -46,7 +48,7 @@ class Home extends React.Component {
         <h1>{`Welcome, ${loggedInUser}!`}</h1>
         <a
           style={{
-            display: status === STATUS.INITIAL ? "inline" : "none",
+            display: status !== STATUS.AUTHENTICATED ? "inline" : "none",
           }}
           href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}
         >

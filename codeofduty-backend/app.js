@@ -15,8 +15,8 @@ app.get("/", (req, res) => {
   res.json({ message: "hello world!" });
 });
 
-async function getUser(token) {
-  await request
+function getUser(token) {
+  return request
     .get("https://api.github.com/user")
     .set("Authorization", `token ${token}`)
     .set("User-Agent", "CodeOfDuty")
@@ -30,8 +30,8 @@ async function getUser(token) {
     });
 }
 
-async function getAccessToken(code) {
-  await request
+function getAccessToken(code) {
+  return request
     .post("https://github.com/login/oauth/access_token")
     .send({
       client_id: process.env.OAUTH_CLIENT_ID,
@@ -39,10 +39,7 @@ async function getAccessToken(code) {
       code,
     })
     .set("Accept", "application/json")
-    .then((res) => {
-      const { accessToken } = res.body;
-      return accessToken;
-    })
+    .then((res) => res.body.access_token)
     .catch((err) => {
       throw err;
     });
@@ -55,9 +52,13 @@ app.get("/authenticate", async (req, res) => {
       message: "Error: no code",
     });
   }
-  const token = await getAccessToken(code);
-  const user = await getUser(token);
-  return res.status(200).send({ token, user });
+  try {
+    const token = await getAccessToken(code);
+    const user = await getUser(token);
+    return res.status(200).send({ token, user });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
 });
 
 app.get("/fetchUserSprints", (req, res) => {
