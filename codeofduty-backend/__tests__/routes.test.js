@@ -16,7 +16,7 @@ beforeAll(async (done) => {
 it("Should return sprints of a user", async (done) => {
   // Sends request...
   const userSprints = await request(app).get(
-    "/fetchUserSprints?user=vrushti-mody"
+    "/fetchUserSprints?user=vrushti-mody",
   );
   expect(userSprints).toBeTruthy();
   done();

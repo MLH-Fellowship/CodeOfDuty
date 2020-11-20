@@ -31,6 +31,7 @@ jobs:
       run: |
         cd codeofduty-frontend
         npm install
+        npm run lint
         npm test
         cd ..
     - name: Test Backend
@@ -41,6 +42,7 @@ jobs:
       run: |
         cd codeofduty-backend
         npm install
+        npm run lint
         npm test
         cd ..    
         

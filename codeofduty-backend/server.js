@@ -1,5 +1,6 @@
-const app = require("./app");
+/* eslint-disable no-console */
 const mongoose = require("mongoose");
+const app = require("./app");
 require("dotenv").config();
 
 // Server listening on port
