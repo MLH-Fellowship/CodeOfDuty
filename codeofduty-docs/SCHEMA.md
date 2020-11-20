@@ -24,8 +24,9 @@
             [
                 {
                     "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",     // Name of the Sprint
-                    "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
+                    "sprint_name": "Sprint 5 | v1.2.2",             // Name of the Sprint
+                    "sprint_perm_id": "5474108b48",                 // Sprint perm id
+                    "sprint_repo: "owner/repo"                      // Repo of the sprint
                 }
             ]
             ```
@@ -37,7 +38,8 @@
                 {
                     "sprint_object": "542c2b97bac0595474108b48",                // Sprint Object Id  
                     "sprint_name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
-                    "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
+                    "sprint_perm_id": "5474108b48",                             // Sprint perm id
+                    "sprint_repo: "owner/repo"                                  // Repo of the sprint
                 }
             ]
             ```
@@ -70,9 +72,9 @@
     - `name` - Name of the Sprint (GitHub Milestone)
         - Type: String
         - Example: `"Sprint 5 | v1.2.2"`
-    - `sprint_url` - Link to the Sprint Page on the app
+    - `sprint_perm_id` - Unique Id to the Sprint (Last 10 characters of the _id)
         - Type: String
-        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty/10"`
+        - Example: `"5474108b48"`
     - `milestone_url` - Link to the GitHub Milestone that the Sprint Tracks
         - Type: String
         - Example: `"https://github.com/MLH-Fellowship/CodeOfDuty/milestone/1"`

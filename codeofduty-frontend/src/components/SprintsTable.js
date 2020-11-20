@@ -44,9 +44,13 @@ class SprintsTable extends React.Component {
                 // eslint-disable-next-line no-underscore-dangle
                 <TableRow key={sprint._id}>
                   <TableCell component="th" scope="row">
-                    {sprint.name}
+                    <a href={`/repo/${sprint.repo}/${sprint.sprint_perm_id}`}>
+                      {sprint.name}
+                    </a>
                   </TableCell>
-                  <TableCell align="right">{sprint.repo}</TableCell>
+                  <TableCell align="right">
+                    <a href={`/repo/${sprint.repo}`}>{sprint.repo}</a>
+                  </TableCell>
                   <TableCell align="right">
                     {new Date(sprint.due_date).toString()}
                   </TableCell>

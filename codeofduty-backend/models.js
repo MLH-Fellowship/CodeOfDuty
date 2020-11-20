@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const sprintOverviewSchema = new mongoose.Schema({
   sprint_object: String,
   sprint_name: String,
-  sprint_url: String,
+  sprint_perm_id: String,
+  sprint_repo: String,
 });
 
 const repoLevelContributorSchema = new mongoose.Schema({
@@ -39,7 +40,7 @@ const repoSchema = new mongoose.Schema({
 const sprintSchema = new mongoose.Schema({
   repo: String,
   name: String,
-  sprint_url: String,
+  sprint_perm_id: String,
   milestone_url: String,
   contributors: [sprintLevelContributorSchema],
   tasks: [taskSchema],
