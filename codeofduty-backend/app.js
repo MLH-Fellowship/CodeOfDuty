@@ -75,4 +75,20 @@ app.get("/fetchGlobalSprints", (req, res) => {
     .exec((err, docs) => res.send(docs));
 });
 
+app.get("/repo/:owner/:repo", async (req, res) => {
+  const repo = `${req.params.owner}/${req.params.repo}`;
+  return models.Repo.findById(repo).then((doc) => {
+    if (doc === null) res.status(404).send(doc);
+    else res.status(200).send(doc);
+  });
+});
+
+app.get("/sprint/:sprintId", async (req, res) => {
+  const { sprintId } = req.params;
+  return models.Sprint.findOne({ sprint_perm_id: sprintId }).then((doc) => {
+    if (doc === null) res.status(404).send(doc);
+    else res.status(200).send(doc);
+  });
+});
+
 module.exports = app;
