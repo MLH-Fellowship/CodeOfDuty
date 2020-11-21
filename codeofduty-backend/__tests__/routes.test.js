@@ -13,7 +13,7 @@ beforeAll(async (done) => {
   done();
 });
 
-it("Should return sprints of a user", async (done) => {
+test("Should return sprints of a user", async (done) => {
   // Sends request...
   const userSprints = await request(app).get(
     "/fetchUserSprints?user=vrushti-mody",
@@ -22,7 +22,7 @@ it("Should return sprints of a user", async (done) => {
   done();
 });
 
-it("Should return all sprints (Top 10)", async (done) => {
+test("Should return all sprints (Top 10)", async (done) => {
   // Sends request...
   const topSprints = await request(app).get("/fetchGlobalSprints");
   expect(topSprints).toBeTruthy();
