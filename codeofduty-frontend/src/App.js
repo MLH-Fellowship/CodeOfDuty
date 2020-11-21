@@ -11,8 +11,6 @@ function App() {
     <div className="App">
       <Router>
         <Route exact path="/" component={Home} />
-<<<<<<< HEAD
-=======
         <Route
           exact
           path="/repo/:owner/:repo/:sprintPermId"
@@ -20,7 +18,6 @@ function App() {
         />
         <Route exact path="/repo/:owner/:repo" component={RepoLayout} />
         <Route exact path="/createSprint" component={CreateLayout} />
->>>>>>> 26b45a76930fff78f4c09b04b00a29cdb72dc3ed
       </Router>
     </div>
   );

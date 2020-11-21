@@ -24,16 +24,10 @@
         "react/jsx-filename-extension": [1, {
         "extensions": [".js", ".jsx"]}
         ],
-<<<<<<< HEAD
-        "prettier/prettier": ["error", {
-           "endOfLine":"auto"
-        }]
-=======
         "prettier/prettier": ["warn", {
            "endOfLine":"auto"
         }],
         "react/prop-types": 0
->>>>>>> 26b45a76930fff78f4c09b04b00a29cdb72dc3ed
     },
     "settings": {
         "jest": {
