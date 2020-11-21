@@ -1,12 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {
-  withStyles,
-  CssBaseline,
-  Typography,
-  Grid,
-  Button,
-} from "@material-ui/core";
+import { withStyles, Typography, Grid, Button } from "@material-ui/core";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import Header from "../components/Header";
@@ -131,7 +125,6 @@ class Home extends React.Component {
     const { loggedInUser, status, globalSprints, userSprints } = this.state;
     return (
       <div className={classes.root}>
-        <CssBaseline />
         <Header />
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
