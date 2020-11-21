@@ -13,7 +13,7 @@ Response object:
     {
         repo: 'CodeOfDuty',
         name: 'COD',
-        sprint_url: 'https://github.com/MLHFellowship/Code-of-Duty',
+        sprint_perm_id: '5474108b48',
         milestone_url: 'https://github.com/MLHFellowship/Code-of-Duty/milestone/1',
         contributors: [{
                 user: 'vrushti-mody',
