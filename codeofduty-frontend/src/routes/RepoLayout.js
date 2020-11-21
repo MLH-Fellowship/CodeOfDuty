@@ -5,8 +5,8 @@ import Header from "../components/Header";
 
 const style = () => ({
   root: {
-    height: "95vh",
-    width: "95vw",
+    height: "95%",
+    width: "95%",
   },
 });
 
