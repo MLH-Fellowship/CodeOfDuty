@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import Header from "../components/Header";
 import SprintsTable from "../components/SprintsTable";
 
 const STATUS = {
@@ -131,16 +132,7 @@ class Home extends React.Component {
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <div className={classes.paper}>
-          <span>
-            <Typography className={classes.header} variant="h2" center="center">
-              Code Of Duty
-            </Typography>
-          </span>
-          <Typography className={classes.sub} variant="h5" align="center">
-            Gamifying Agile Sprints | Making Open Source Contributions Fun!
-          </Typography>
-        </div>
+        <Header />
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
             <Typography className={classes.sub} variant="h4" align="center">
