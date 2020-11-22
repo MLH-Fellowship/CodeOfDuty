@@ -3,14 +3,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const request = require("superagent");
 require("dotenv").config();
-const models = require("./models");
-const sprintsRouter = require("./routes/sprints");
 
 const app = express();
+const models = require("./models");
+
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use("/sprints", sprintsRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "hello world!" });
@@ -75,7 +74,7 @@ app.post("/createWebhook", async (req, res) => {
 app.get("/authenticate", async (req, res) => {
   const { code } = req.query;
   if (!code) {
-    return res.status(401).send({
+    return res.status(400).send({
       message: "Error: no code",
     });
   }
@@ -102,7 +101,6 @@ app.get("/fetchGlobalSprints", (req, res) => {
     .exec((err, docs) => res.send(docs));
 });
 
-<<<<<<< HEAD
 app.post("/issue", async (req, res) => {
   if (req.body.action === "milestoned") {
     let points = 0;
@@ -209,7 +207,6 @@ app.post("/issue", async (req, res) => {
   }
   if (req.body.action === "assigned") {
     if (req.body.issue.milestone) {
-      console.log("here");
       let points = 0;
       req.body.issue.labels.forEach(async (label) => {
         if (!label.name.NaN) {
@@ -240,11 +237,6 @@ app.post("/issue", async (req, res) => {
           { $push: { contributors: contributor } },
         );
       }
-      console.log(
-        req.body.issue.milestone.html_url,
-        req.body.issue.html_url,
-        assignee,
-      );
       await models.Sprint.findOneAndUpdate(
         {
           milestone_url: req.body.issue.milestone.html_url,
@@ -253,75 +245,42 @@ app.post("/issue", async (req, res) => {
         { "tasks.$.contributor": assignee },
       );
     }
+  } else if (req.body.action === "labeled") {
+    if (req.body.issue.milestone && req.body.issue.assignee) {
+      let points = 0;
+      req.body.issue.labels.forEach(async (label) => {
+        if (!label.name.NaN) {
+          points = parseInt(label.name, 10);
+        }
+      });
+      await models.Sprint.findOneAndUpdate(
+        { milestone_url: req.body.issue.milestone.html_url },
+        { $inc: { boss_hp: points, boss_hp_max: points } },
+      );
+      await models.Sprint.findOneAndUpdate(
+        {
+          milestone_url: req.body.issue.milestone.html_url,
+          "tasks.issue_url": req.body.issue.html_url,
+        },
+        {
+          "tasks.$.contributor_points": 0.8 * points,
+          "tasks.$.reviewer_points": 0.8 * points,
+        },
+      );
+      await models.Sprint.findOneAndUpdate(
+        {
+          milestone_url: req.body.issue.milestone.html_url,
+          "contributors.user": req.body.issue.assignee.login,
+        },
+        { $inc: { "contributors.$.points_at_stake": points } },
+      );
+    }
   }
 
   res.send({
     statusCode: 200,
     message: "Done",
   });
-=======
-app.get("/fetchUserRepos", async (req, res) => {
-  const token = req.header("authorization");
-  if (!token) {
-    res.status(401).send({ message: "Not authorized" });
-    return;
-  }
-  await request
-    .get("https://api.github.com/user/repos?sort=created")
-    .set("Authorization", `token ${token}`)
-    .set("User-Agent", "CodeOfDuty")
-    .set("Accept", "application/vnd.github.v3+json")
-    .then((result) => {
-      const repos = result.body;
-      res.status(200).send(repos.map((repo) => repo.full_name));
-    })
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
-    });
-});
-
-app.get("/fetchRepoMilestones", async (req, res) => {
-  const token = req.header("authorization");
-  const { repo } = req.query;
-  if (!repo) {
-    res.status(400).send({ message: "No repository selected" });
-    return;
-  }
-
-  if (!token) {
-    res.status(401).send({ message: "Not authorized" });
-    return;
-  }
-
-  await request
-    .get(
-      `https://api.github.com/repos/${repo}/milestones?state=open&sort=due_on`,
-    )
-    .set("Authorization", `token ${token}`)
-    .set("User-Agent", "CodeOfDuty")
-    .set("Accept", "application/vnd.github.v3+json")
-    .then((result) => {
-      const milestones = result.body;
-      res.status(200).send(
-        milestones.reduce((validMilestones, ms) => {
-          // Make sure due date is specified and has not expired
-          if (ms.due_on && new Date(ms.due_on) > new Date()) {
-            validMilestones.push({
-              url: ms.html_url,
-              number: ms.number,
-              name: ms.title,
-              id: ms.id,
-              dueDate: ms.due_on,
-            });
-          }
-          return validMilestones;
-        }, []),
-      );
-    })
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
-    });
->>>>>>> b76f06251549ecb245af800444620d4912c6000d
 });
 
 module.exports = app;
