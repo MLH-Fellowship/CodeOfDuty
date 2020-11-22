@@ -16,25 +16,6 @@ app.get("/", (req, res) => {
   res.json({ message: "hello world!" });
 });
 
-function createWebhook(token, repo, event, url) {
-  return request
-    .post(`https://api.github.com/repos/${repo}/hooks`)
-    .set("Accept", "application/vnd.github.v3+json")
-    .set("Authorization", `token ${token}`)
-    .set("User-Agent", "CodeOfDuty")
-    .send({
-      name: "web",
-      config: {
-        url,
-        content_type: "json",
-        insecure_ssl: 0,
-      },
-      events: [event],
-    })
-    .then((result) => result)
-    .catch((err) => err);
-}
-
 function getUser(token) {
   return request
     .get("https://api.github.com/user")
@@ -64,13 +45,6 @@ function getAccessToken(code) {
       throw err;
     });
 }
-
-app.post("/createWebhook", async (req, res) => {
-  // eslint-disable-next-line object-curly-newline
-  const { token, repo, event, url } = req.body;
-  const webhookRes = await createWebhook(token, repo, event, url);
-  res.send(webhookRes);
-});
 
 app.get("/authenticate", async (req, res) => {
   const { code } = req.query;
