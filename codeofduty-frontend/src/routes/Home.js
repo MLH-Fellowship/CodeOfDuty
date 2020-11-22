@@ -1,10 +1,17 @@
 import React from "react";
 import axios from "axios";
-import { withStyles, Typography, Grid, Button } from "@material-ui/core";
+import {
+  withStyles,
+  Typography,
+  Grid,
+  Button,
+  Dialog,
+} from "@material-ui/core";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import Header from "../components/Header";
 import SprintsTable from "../components/SprintsTable";
+import CreateSprint from "../components/CreateSprint";
 
 const STATUS = {
   INITIAL: "initial",
@@ -70,8 +77,8 @@ class Home extends React.Component {
     this.state = {
       loggedInUser: "warrior",
       status: STATUS.INITIAL,
-      // eslint-disable-next-line react/no-unused-state
       token: null,
+      createSprintModalOpen: false,
     };
   }
 
@@ -88,7 +95,6 @@ class Home extends React.Component {
           if (res.status === 200) {
             const { token, user } = res.data;
             this.setState({
-              // eslint-disable-next-line react/no-unused-state
               token,
               loggedInUser: user.login,
               status: STATUS.AUTHENTICATED,
@@ -99,6 +105,14 @@ class Home extends React.Component {
     }
     this.fetchGlobalSprints();
   }
+
+  handleModalOpen = () => {
+    this.setState({ createSprintModalOpen: true });
+  };
+
+  handleModalClose = () => {
+    this.setState({ createSprintModalOpen: false });
+  };
 
   async fetchGlobalSprints() {
     await axios.get("http://localhost:5000/fetchGlobalSprints").then((res) => {
@@ -121,8 +135,14 @@ class Home extends React.Component {
   render() {
     const { classes } = this.props;
 
-    // eslint-disable-next-line no-unused-vars
-    const { loggedInUser, status, globalSprints, userSprints } = this.state;
+    const {
+      loggedInUser,
+      status,
+      globalSprints,
+      userSprints,
+      createSprintModalOpen,
+      token,
+    } = this.state;
     return (
       <div className={classes.root}>
         <Header />
@@ -163,12 +183,19 @@ class Home extends React.Component {
                     variant="contained"
                     color="primary"
                     startIcon={<AddCircleIcon />}
-                    href="/createSprint"
+                    onClick={this.handleModalOpen}
                   >
                     Create New Sprint
                   </Button>
                 </div>
                 <SprintsTable sprintData={userSprints} />
+                <Dialog
+                  open={createSprintModalOpen}
+                  onClose={this.handleModalClose}
+                  fullWidth
+                >
+                  <CreateSprint token={token} user={loggedInUser} />
+                </Dialog>
               </div>
             )}
           </Grid>

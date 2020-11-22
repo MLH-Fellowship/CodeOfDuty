@@ -8,25 +8,22 @@
 ### Repository 
 
 - repositories (Collection)
-    - `_id` - Repository ID
+    - `repo_name` - Repository ID
         - Type: String `"{owner}/{repo}"`
         - Example: `"MLH-Fellowship/CodeOfDuty"`
-    - `repo_url` - Link to the repo page on the app
-        - Type: String 
-        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty"` 
-    - `maintainers` - Maintainers for a repo
-        - Type: Array[String] `github-usernames`
-        - Example: `["cqvu", "ajwad-shaikh", "vrusti-mody"]`
+    - `maintainer` - Maintainer for a repo
+        - Type: String `github-username`
+        - Example: "cqvu"
     - `past_sprints` - Tracked Past Sprints for a repo
         - Type: Array[Sprint Overview]
         - Example:
             ```
             [
                 {
-                    "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",             // Name of the Sprint
+                    "_id": "542c2b97bac0595474108b48",    // Sprint Object Id  
+                    "name": "Sprint 5 | v1.2.2",             // Name of the Sprint
                     "sprint_perm_id": "5474108b48",                 // Sprint perm id
-                    "sprint_repo: "owner/repo"                      // Repo of the sprint
+                    "repo: "owner/repo"                      // Repo of the sprint
                 }
             ]
             ```
@@ -36,10 +33,10 @@
             ```
             [
                 {
-                    "sprint_object": "542c2b97bac0595474108b48",                // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
+                    "_id": "542c2b97bac0595474108b48",                // Sprint Object Id  
+                    "name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
                     "sprint_perm_id": "5474108b48",                             // Sprint perm id
-                    "sprint_repo: "owner/repo"                                  // Repo of the sprint
+                    "repo: "owner/repo"                                  // Repo of the sprint
                 }
             ]
             ```
