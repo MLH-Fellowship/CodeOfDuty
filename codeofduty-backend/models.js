@@ -51,7 +51,6 @@ const sprintSchema = new mongoose.Schema({
 });
 
 const Repo = mongoose.model("Repo", repoSchema);
-
 const Sprint = mongoose.model("Sprint", sprintSchema);
 
 module.exports = {
