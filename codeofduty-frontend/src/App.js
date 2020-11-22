@@ -1,14 +1,15 @@
 import "./App.css";
 import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import { CssBaseline } from "@material-ui/core";
 import Home from "./routes/Home";
 import SprintLayout from "./routes/SprintLayout";
 import RepoLayout from "./routes/RepoLayout";
-import CreateLayout from "./routes/CreateLayout";
 
 function App() {
   return (
     <div className="App">
+      <CssBaseline />
       <Router>
         <Route exact path="/" component={Home} />
         <Route
@@ -17,7 +18,6 @@ function App() {
           component={SprintLayout}
         />
         <Route exact path="/repo/:owner/:repo" component={RepoLayout} />
-        <Route exact path="/createSprint" component={CreateLayout} />
       </Router>
     </div>
   );
