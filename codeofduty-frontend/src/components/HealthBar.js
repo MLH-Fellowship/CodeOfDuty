@@ -41,7 +41,6 @@ const style = () => ({
   },
   boss: {
     marginTop: "10px",
-    width: "80%",
     height: "auto",
   },
 });
@@ -94,7 +93,10 @@ class HealthBar extends React.Component {
         </div>
         <img
           className={classes.boss}
-          style={{ opacity: `${safePercent / 100}` }}
+          style={{
+            width: `${0.8 * (100 - claimedPercent)}%`,
+            opacity: `${(100 - claimedPercent) / 60}`,
+          }}
           src={getSprintBOSS()}
           alt="Sprint Boss Graphic"
         />
