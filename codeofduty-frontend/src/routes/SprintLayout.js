@@ -61,7 +61,6 @@ class SprintLayout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    // eslint-disable-next-line no-unused-vars
     const { owner, repo, data } = this.state;
     return (
       <div className={classes.root}>
@@ -70,7 +69,6 @@ class SprintLayout extends React.Component {
           <Grid container component="main" className={classes.menu}>
             <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">
-                {/* {`${data.name} (${owner}/${repo})`} */}
                 <a href={data.milestone_url}>{data.name}</a>
                 {` | `}
                 <a href={`https://github.com/${owner}/${repo}`}>
