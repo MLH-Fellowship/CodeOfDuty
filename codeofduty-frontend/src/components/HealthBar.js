@@ -1,6 +1,11 @@
 import { Typography, withStyles } from "@material-ui/core";
 import { green, red, yellow } from "@material-ui/core/colors";
 import React from "react";
+import Genie from "../assets/genie.gif";
+import Dragon from "../assets/dragon.gif";
+import Monster from "../assets/monster.gif";
+import Elf from "../assets/elf.gif";
+import Cactus from "../assets/cactus.gif";
 
 const style = () => ({
   healthBar: {
@@ -34,7 +39,18 @@ const style = () => ({
   title: {
     marginBottom: "10px",
   },
+  boss: {
+    marginTop: "10px",
+    width: "80%",
+    height: "auto",
+  },
 });
+
+const sprintBOSS = [Genie, Dragon, Elf, Monster, Cactus];
+
+const getSprintBOSS = () => {
+  return sprintBOSS[Math.floor(Math.random() * sprintBOSS.length)];
+};
 
 class HealthBar extends React.Component {
   constructor(props) {
@@ -76,6 +92,12 @@ class HealthBar extends React.Component {
             <p>{safe}</p>
           </div>
         </div>
+        <img
+          className={classes.boss}
+          style={{ opacity: `${safePercent / 100}` }}
+          src={getSprintBOSS()}
+          alt="Sprint Boss Graphic"
+        />
       </div>
     );
   }

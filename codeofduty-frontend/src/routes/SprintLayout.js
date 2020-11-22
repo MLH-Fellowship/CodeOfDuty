@@ -4,6 +4,7 @@ import { Grid, Typography, withStyles } from "@material-ui/core";
 import Header from "../components/Header";
 import HealthBar from "../components/HealthBar";
 import ParticipantLeaderboard from "../components/ParticipantLeaderboard";
+import TaskBoard from "../components/TaskBoard";
 
 const style = () => ({
   root: {
@@ -20,6 +21,7 @@ const style = () => ({
     padding: "0 2.5% 0 2.5%",
   },
   sub: {
+    marginTop: 10,
     marginBottom: 10,
   },
 });
@@ -46,7 +48,6 @@ class SprintLayout extends React.Component {
 
   componentDidMount() {
     this.fetchSprintData();
-    this.fetchRepoData();
   }
 
   async fetchSprintData() {
@@ -58,24 +59,14 @@ class SprintLayout extends React.Component {
     });
   }
 
-  async fetchRepoData() {
-    const { owner, repo } = this.state;
-    axios.get(`http://localhost:5000/repo/${owner}/${repo}`).then((res) => {
-      this.setState({
-        repoData: res.data,
-      });
-    });
-  }
-
   render() {
     const { classes } = this.props;
     // eslint-disable-next-line no-unused-vars
-    const { owner, repo, sprintPermId, data, repoData } = this.state;
-    console.log(data);
+    const { owner, repo, data } = this.state;
     return (
       <div className={classes.root}>
         <Header />
-        {data && repoData && (
+        {data && (
           <Grid container component="main" className={classes.menu}>
             <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">
@@ -83,7 +74,9 @@ class SprintLayout extends React.Component {
               </Typography>
               <Typography className={classes.sub} variant="h6" align="left">
                 {`Repository Link: `}
-                <a href={repoData.repo_url}>{repoData.repo_url}</a>
+                <a href={`https://github.com/${owner}/${repo}`}>
+                  {`https://github.com/${owner}/${repo}`}
+                </a>
               </Typography>
               <Typography className={classes.sub} variant="h6" align="left">
                 {`Milestone Link: `}
@@ -97,15 +90,17 @@ class SprintLayout extends React.Component {
                   )}
                 />
               </Typography>
+              <Typography className={classes.sub} variant="h5" align="center">
+                Sprint Task Board
+                <TaskBoard taskData={data.tasks} />
+              </Typography>
             </Grid>
             <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
-              {/* <SprintsTable sprintData={globalSprints} /> */}
               <HealthBar
                 maxHp={data.boss_hp_max}
                 currHp={data.boss_hp}
                 staked={getStakePoints(data.contributors)}
               />
-              Sprint Graphic
             </Grid>
           </Grid>
         )}

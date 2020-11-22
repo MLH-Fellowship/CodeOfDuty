@@ -12,7 +12,7 @@ const style = () => ({
 class CreateLayout extends React.Component {
   constructor(props) {
     super(props);
-    this.setState({});
+    this.state = {};
   }
 
   render() {
