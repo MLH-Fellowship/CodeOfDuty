@@ -70,17 +70,12 @@ class SprintLayout extends React.Component {
           <Grid container component="main" className={classes.menu}>
             <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">
-                {`${data.name} (${owner}/${repo})`}
-              </Typography>
-              <Typography className={classes.sub} variant="h6" align="left">
-                {`Repository Link: `}
+                {/* {`${data.name} (${owner}/${repo})`} */}
+                <a href={data.milestone_url}>{data.name}</a>
+                {` | `}
                 <a href={`https://github.com/${owner}/${repo}`}>
-                  {`https://github.com/${owner}/${repo}`}
+                  {`(${owner}/${repo})`}
                 </a>
-              </Typography>
-              <Typography className={classes.sub} variant="h6" align="left">
-                {`Milestone Link: `}
-                <a href={data.milestone_url}>{data.milestone_url}</a>
               </Typography>
               <Typography className={classes.sub} variant="h5" align="center">
                 {`Sprint Leaderboard `}
