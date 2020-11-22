@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/*
 Sprints API routes
 */
 const express = require("express");
