@@ -101,15 +101,13 @@ router.route("/create").post(async (req, res) => {
     boss_hp: bossMaxHealth,
     boss_hp_max: bossMaxHealth,
     victory_threshold: victoryThreshold || DEFAULT_THRESHOLD,
-    due_date: milestone.due_date,
+    due_date: Date(milestone.due_date),
   });
 
-  res.send(newSprint);
-
-  // newSprint
-  //   .save()
-  //   .then(() => res.json(newSprint))
-  //   .catch((err) => err.status(500).send(err));
+  newSprint
+    .save()
+    .then(() => res.json(newSprint))
+    .catch((err) => err.status(500).send(err));
 });
 
 module.exports = router;
