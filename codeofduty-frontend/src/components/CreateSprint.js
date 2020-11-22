@@ -47,11 +47,12 @@ class CreateSprint extends React.Component {
   handleSubmit = (event) => {
     event.preventDefault();
     const { repo, milestone, settings } = this.state;
-    const { token, history } = this.props;
+    const { token, user, history } = this.props;
     axios
       .post(
         "http://localhost:5000/sprints/create",
         {
+          user,
           repo,
           milestone,
           victoryThreshold: settings.victoryThreshold,

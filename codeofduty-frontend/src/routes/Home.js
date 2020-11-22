@@ -204,7 +204,7 @@ class Home extends React.Component {
                   onClose={this.handleModalClose}
                   fullWidth
                 >
-                  <CreateSprint token={token} />
+                  <CreateSprint token={token} user={loggedInUser} />
                 </Dialog>
               </div>
             )}

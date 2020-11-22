@@ -6,8 +6,8 @@
         "jest/globals": true
     },
     "extends": [
-        "prettier",
-        "airbnb-base"
+        "airbnb-base",
+        "prettier"
     ],
     "plugins": [
         "prettier",
