@@ -1,7 +1,10 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-console */
 const mongoose = require("mongoose");
 const app = require("./app");
 require("dotenv").config();
+// eslint-disable-next-line import/order
+const SmeeClient = require("smee-client");
 
 // Server listening on port
 const port = process.env.PORT || 5000;
@@ -18,5 +21,27 @@ mongoose.connect(uri, {
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
 });
+
+const smee_issue = new SmeeClient({
+  source: "https://smee.io/DPRAJgsLmMZ4x1i",
+  target: "http://localhost:5000/issue",
+  logger: console,
+});
+
+const smee_milestone = new SmeeClient({
+  source: "https://smee.io/CdTNBbuTf7UTClP",
+  target: "http://localhost:5000/milestone",
+  logger: console,
+});
+
+const smee_pullrequest = new SmeeClient({
+  source: "https://smee.io/9ZZIlWHgkwlkMdhK",
+  target: "http://localhost:5000/pullrequest",
+  logger: console,
+});
+
+smee_issue.start();
+smee_milestone.start();
+smee_pullrequest.start();
 
 app.listen(port, () => console.log(`Server starting on port ${port}!`));
