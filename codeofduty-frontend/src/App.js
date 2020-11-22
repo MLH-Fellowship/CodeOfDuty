@@ -5,7 +5,6 @@ import { CssBaseline } from "@material-ui/core";
 import Home from "./routes/Home";
 import SprintLayout from "./routes/SprintLayout";
 import RepoLayout from "./routes/RepoLayout";
-import CreateLayout from "./routes/CreateLayout";
 
 function App() {
   return (
@@ -19,7 +18,6 @@ function App() {
           component={SprintLayout}
         />
         <Route exact path="/repo/:owner/:repo" component={RepoLayout} />
-        <Route exact path="/createSprint" component={CreateLayout} />
       </Router>
     </div>
   );

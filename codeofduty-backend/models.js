@@ -4,7 +4,7 @@ const sprintOverviewSchema = new mongoose.Schema({
   _id: String,
   name: String,
   sprint_perm_id: String,
-  repo: String,
+  due_date: Date,
 });
 
 const repoLevelContributorSchema = new mongoose.Schema({
