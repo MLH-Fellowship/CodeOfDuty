@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
 Sprints API routes
 */
@@ -74,6 +75,25 @@ function calculateBossHealth(tasks) {
   return totalPoints;
 }
 
+function createWebhook(token, repo, event, url) {
+  return request
+    .post(`https://api.github.com/repos/${repo}/hooks`)
+    .set("Accept", "application/vnd.github.v3+json")
+    .set("Authorization", `token ${token}`)
+    .set("User-Agent", "CodeOfDuty")
+    .send({
+      name: "web",
+      config: {
+        url,
+        content_type: "json",
+        insecure_ssl: 0,
+      },
+      events: [event],
+    })
+    .then((result) => result)
+    .catch((err) => err);
+}
+
 router.route("/create").post(async (req, res) => {
   const token = req.header("authorization");
   const { user, repo, milestone, victoryThreshold } = req.body;
@@ -117,7 +137,10 @@ router.route("/create").post(async (req, res) => {
         active_sprints: [newSprint],
         contributors: [],
       });
-      newRepo.save().then(() => Promise.resolve(this));
+      newRepo.save().then(() => {
+        console.log(`Repo ${repo} added to the db`);
+        Promise.resolve(this);
+      });
     } else {
       /* Add sprint to active sprints if repo is present in db */
       Repo.findOneAndUpdate(
@@ -132,6 +155,7 @@ router.route("/create").post(async (req, res) => {
           if (error) {
             res.status(500).send(error);
           } else {
+            console.log(`Sprint ${newSprint.name} added to Repo ${repo}`);
             Promise.resolve(this);
           }
         },
@@ -142,8 +166,39 @@ router.route("/create").post(async (req, res) => {
   // Save the sprint to db
   newSprint
     .save()
-    .then(() => res.json(newSprint))
+    .then(() => console.log(`Sprint ${newSprint.name} added to the db`))
     .catch((err) => res.status(500).send(err));
+
+  // Attach webhooks to sprint
+  const issueWebhook = await createWebhook(
+    token,
+    repo,
+    "issues",
+    process.env.ISSUE_WEBHOOK_URL,
+  );
+  const prWebhook = await createWebhook(
+    token,
+    repo,
+    "pull_request",
+    process.env.PR_WEBHOOK_URL,
+  );
+  const milestoneWebhook = await createWebhook(
+    token,
+    repo,
+    "milestone",
+    process.env.MILESTONE_WEBHOOK_URL,
+  );
+
+  if (
+    issueWebhook.status !== 201 ||
+    prWebhook.status !== 201 ||
+    milestoneWebhook !== 201
+  ) {
+    res.status(500).send({ message: "Error creating webhooks" });
+  } else {
+    console.log("Webhooks added successfully");
+    res.status(200).send({ message: "Sprint created successfully" });
+  }
 });
 
 module.exports = router;
