@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const request = require("superagent");
 require("dotenv").config();
-// eslint-disable-next-line no-unused-vars
 const sprintsRouter = require("./routes/sprints");
 
 const app = express();
@@ -12,7 +11,7 @@ const models = require("./models");
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use("/sprints", sprintsRouter);
 app.get("/", (req, res) => {
   res.json({ message: "hello world!" });
 });
