@@ -19,6 +19,7 @@ const sprintLevelContributorSchema = new mongoose.Schema({
 });
 
 const taskSchema = new mongoose.Schema({
+  title: String,
   issue_url: String,
   pr_url: String,
   task_status: String,
