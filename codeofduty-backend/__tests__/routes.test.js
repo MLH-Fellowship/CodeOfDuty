@@ -29,6 +29,30 @@ test("Should return all sprints (Top 10)", async (done) => {
   done();
 });
 
+it("Fetch Existing Repo", async (done) => {
+  const response = await request(app).get("/repo/MLH-Fellowship/AmongUps");
+  expect(response.statusCode).toBe(200);
+  done();
+});
+
+it("Give Error for Non-Existing Repo", async (done) => {
+  const response = await request(app).get("/repo/test/nkajvka");
+  expect(response.statusCode).toBe(404);
+  done();
+});
+
+it("Fetch Existing Sprint", async (done) => {
+  const response = await request(app).get("/sprint/994a1832cb");
+  expect(response.statusCode).toBe(200);
+  done();
+});
+
+it("Give Error for Non-Existing Repo", async (done) => {
+  const response = await request(app).get("/sprint/alnclas");
+  expect(response.statusCode).toBe(404);
+  done();
+});
+
 afterAll(async (done) => {
   await mongoose.disconnect();
   done();
