@@ -8,7 +8,7 @@
 ### Repository 
 
 - repositories (Collection)
-    - `repo_name` - Repository ID
+    - `_id` - Repository ID
         - Type: String `"{owner}/{repo}"`
         - Example: `"MLH-Fellowship/CodeOfDuty"`
     - `maintainer` - Maintainer for a repo

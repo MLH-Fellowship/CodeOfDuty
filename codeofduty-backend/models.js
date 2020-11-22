@@ -29,7 +29,7 @@ const taskSchema = new mongoose.Schema({
 });
 
 const repoSchema = new mongoose.Schema({
-  repo_name: String,
+  _id: String, // repo_name
   maintainer: String,
   past_sprints: [sprintOverviewSchema],
   active_sprints: [sprintOverviewSchema],
