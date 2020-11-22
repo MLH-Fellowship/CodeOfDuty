@@ -3,7 +3,7 @@ Sprints API routes
 */
 const express = require("express");
 const request = require("superagent");
-const { Sprint } = require("../models.js");
+const { Repo, Sprint } = require("../models.js");
 
 const router = express.Router();
 
@@ -76,7 +76,7 @@ function calculateBossHealth(tasks) {
 
 router.route("/create").post(async (req, res) => {
   const token = req.header("authorization");
-  const { repo, milestone, victoryThreshold } = req.body;
+  const { user, repo, milestone, victoryThreshold } = req.body;
 
   if (!repo || !milestone) {
     res.status(400).send({ message: "Missing parameters" });
@@ -91,6 +91,8 @@ router.route("/create").post(async (req, res) => {
   const tasks = await getSprintTasks(token, repo, milestone);
   const bossMaxHealth = calculateBossHealth(tasks);
   const contributors = getContributors(tasks);
+
+  // Create new Sprint
   const newSprint = new Sprint({
     repo,
     name: milestone.name,
@@ -104,10 +106,44 @@ router.route("/create").post(async (req, res) => {
     due_date: Date(milestone.due_date),
   });
 
+  // Add new sprint to repo (if exists, else create a new repo)
+  Repo.findOne({ repo_name: repo }, (err, doc) => {
+    if (doc === null) {
+      /* If repo doesn't exist */
+      const newRepo = new Repo({
+        repo_name: repo,
+        maintainer: user,
+        past_sprints: [],
+        active_sprints: [newSprint],
+        contributors: [],
+      });
+      newRepo.save().then(() => Promise.resolve(this));
+    } else {
+      /* Add sprint to active sprints if repo is present in db */
+      Repo.findOneAndUpdate(
+        { repo_name: repo },
+        {
+          $push: {
+            active_sprints: newSprint,
+          },
+        },
+        { new: true, upsert: false },
+        (error) => {
+          if (error) {
+            res.status(500).send(error);
+          } else {
+            Promise.resolve(this);
+          }
+        },
+      );
+    }
+  });
+
+  // Save the sprint to db
   newSprint
     .save()
     .then(() => res.json(newSprint))
-    .catch((err) => err.status(500).send(err));
+    .catch((err) => res.status(500).send(err));
 });
 
 module.exports = router;
