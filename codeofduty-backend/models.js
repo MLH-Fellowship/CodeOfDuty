@@ -4,7 +4,7 @@ const sprintOverviewSchema = new mongoose.Schema({
   _id: String,
   name: String,
   sprint_perm_id: String,
-  repo: String,
+  due_date: Date,
 });
 
 const repoLevelContributorSchema = new mongoose.Schema({
@@ -19,6 +19,7 @@ const sprintLevelContributorSchema = new mongoose.Schema({
 });
 
 const taskSchema = new mongoose.Schema({
+  title: String,
   issue_url: String,
   pr_url: String,
   task_status: String,
@@ -29,7 +30,7 @@ const taskSchema = new mongoose.Schema({
 });
 
 const repoSchema = new mongoose.Schema({
-  repo_name: String,
+  _id: String, // repo_name
   maintainer: String,
   past_sprints: [sprintOverviewSchema],
   active_sprints: [sprintOverviewSchema],
