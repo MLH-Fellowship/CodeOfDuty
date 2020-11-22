@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const request = require("superagent");
 require("dotenv").config();
+// eslint-disable-next-line no-unused-vars
+const sprintsRouter = require("./routes/sprints");
 
 const app = express();
 const models = require("./models");
@@ -48,7 +50,7 @@ function getAccessToken(code) {
 app.get("/authenticate", async (req, res) => {
   const { code } = req.query;
   if (!code) {
-    return res.status(400).send({
+    return res.status(401).send({
       message: "Error: no code",
     });
   }
@@ -73,6 +75,69 @@ app.get("/fetchGlobalSprints", (req, res) => {
     .sort({ due_date: "desc" })
     .limit(10)
     .exec((err, docs) => res.send(docs));
+});
+
+app.get("/fetchUserRepos", async (req, res) => {
+  const token = req.header("authorization");
+  if (!token) {
+    res.status(401).send({ message: "Not authorized" });
+    return;
+  }
+  await request
+    .get("https://api.github.com/user/repos?sort=created")
+    .set("Authorization", `token ${token}`)
+    .set("User-Agent", "CodeOfDuty")
+    .set("Accept", "application/vnd.github.v3+json")
+    .then((result) => {
+      const repos = result.body;
+      res.status(200).send(repos.map((repo) => repo.full_name));
+    })
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
+    });
+});
+
+app.get("/fetchRepoMilestones", async (req, res) => {
+  const token = req.header("authorization");
+  const { repo } = req.query;
+  if (!repo) {
+    res.status(400).send({ message: "No repository selected" });
+    return;
+  }
+
+  if (!token) {
+    res.status(401).send({ message: "Not authorized" });
+    return;
+  }
+
+  await request
+    .get(
+      `https://api.github.com/repos/${repo}/milestones?state=open&sort=due_on`,
+    )
+    .set("Authorization", `token ${token}`)
+    .set("User-Agent", "CodeOfDuty")
+    .set("Accept", "application/vnd.github.v3+json")
+    .then((result) => {
+      const milestones = result.body;
+      res.status(200).send(
+        milestones.reduce((validMilestones, ms) => {
+          // Make sure due date is specified and has not expired
+          if (ms.due_on && new Date(ms.due_on) > new Date()) {
+            validMilestones.push({
+              url: ms.html_url,
+              number: ms.number,
+              name: ms.title,
+              id: ms.id,
+              dueDate: ms.due_on,
+            });
+          }
+          return validMilestones;
+        }, []),
+      );
+    })
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
+    });
 });
 
 app.post("/issue", async (req, res) => {
