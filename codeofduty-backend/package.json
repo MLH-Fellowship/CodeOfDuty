@@ -17,6 +17,7 @@
     "express": "^4.17.1",
     "mongoose": "^5.10.15",
     "nodemon": "^2.0.6",
+    "smee-client": "^1.2.2",
     "superagent": "^6.1.0"
   },
   "devDependencies": {
@@ -28,7 +29,6 @@
     "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.6.3",
     "prettier": "^2.1.2",
-    "smee-client": "^1.2.2",
     "supertest": "^6.0.1"
   }
 }
