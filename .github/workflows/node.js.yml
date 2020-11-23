@@ -31,6 +31,7 @@ jobs:
       run: |
         cd codeofduty-frontend
         npm install
+        npm run lint
         npm test
         cd ..
     - name: Test Backend
@@ -38,9 +39,13 @@ jobs:
         ATLAS_URI: ${{ secrets.ATLAS_URI }}
         OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
         OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+        ISSUE_WEBHOOK_URL: ${{ secrets.ISSUE_WEBHOOK_URL }}
+        PR_WEBHOOK_URL: ${{ secrets.PR_WEBHOOK_URL }}
+        MILESTONE_WEBHOOK_URL: ${{ secrets.MILESTONE_WEBHOOK_URL }}
       run: |
         cd codeofduty-backend
         npm install
+        npm run lint
         npm test
         cd ..    
         

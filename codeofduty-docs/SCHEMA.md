@@ -11,21 +11,19 @@
     - `_id` - Repository ID
         - Type: String `"{owner}/{repo}"`
         - Example: `"MLH-Fellowship/CodeOfDuty"`
-    - `repo_url` - Link to the repo page on the app
-        - Type: String 
-        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty"` 
-    - `maintainers` - Maintainers for a repo
-        - Type: Array[String] `github-usernames`
-        - Example: `["cqvu", "ajwad-shaikh", "vrusti-mody"]`
+    - `maintainer` - Maintainer for a repo
+        - Type: String `github-username`
+        - Example: "cqvu"
     - `past_sprints` - Tracked Past Sprints for a repo
         - Type: Array[Sprint Overview]
         - Example:
             ```
             [
                 {
-                    "sprint_object": "542c2b97bac0595474108b48",    // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",     // Name of the Sprint
-                    "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
+                    "_id": "542c2b97bac0595474108b48",    // Sprint Object Id  
+                    "name": "Sprint 5 | v1.2.2",             // Name of the Sprint
+                    "sprint_perm_id": "5474108b48",                 // Sprint perm id
+                    "repo: "owner/repo"                      // Repo of the sprint
                 }
             ]
             ```
@@ -35,9 +33,10 @@
             ```
             [
                 {
-                    "sprint_object": "542c2b97bac0595474108b48",                // Sprint Object Id  
-                    "sprint_name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
-                    "sprint_url": "https://codeofduty.com/owner/repo/10",       // Sprint permanent URL
+                    "_id": "542c2b97bac0595474108b48",                // Sprint Object Id  
+                    "name": "Sprint 5 | v1.2.2",                         // Name of the Sprint
+                    "sprint_perm_id": "5474108b48",                             // Sprint perm id
+                    "repo: "owner/repo"                                  // Repo of the sprint
                 }
             ]
             ```
@@ -70,9 +69,9 @@
     - `name` - Name of the Sprint (GitHub Milestone)
         - Type: String
         - Example: `"Sprint 5 | v1.2.2"`
-    - `sprint_url` - Link to the Sprint Page on the app
+    - `sprint_perm_id` - Unique Id to the Sprint (Last 10 characters of the _id)
         - Type: String
-        - Example: `"https://codeofduty.com/MLH-Fellowship/CodeOfDuty/10"`
+        - Example: `"5474108b48"`
     - `milestone_url` - Link to the GitHub Milestone that the Sprint Tracks
         - Type: String
         - Example: `"https://github.com/MLH-Fellowship/CodeOfDuty/milestone/1"`
@@ -99,6 +98,7 @@
             ```
             [
                 {
+                    "title": "Issue Title - Fix Something Critical",
                     "issue_url": "https://github.com/MLH-Fellowship/CodeOfDuty/issues/1",   // link to the issue on GitHub
                     "pr_url": "https://github.com/MLH-Fellowship/CodeOfDuty/pull/4",        // link to the PR that closes the issue on GitHub
                     "task_status": "under-review",  // one of ['unassigned', 'assigned', 'under-review', 'completed']

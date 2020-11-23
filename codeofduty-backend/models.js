@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 
 const sprintOverviewSchema = new mongoose.Schema({
-  sprint_object: String,
-  sprint_name: String,
-  sprint_url: String,
+  _id: String,
+  name: String,
+  sprint_perm_id: String,
+  due_date: Date,
 });
 
 const repoLevelContributorSchema = new mongoose.Schema({
@@ -18,6 +19,7 @@ const sprintLevelContributorSchema = new mongoose.Schema({
 });
 
 const taskSchema = new mongoose.Schema({
+  title: String,
   issue_url: String,
   pr_url: String,
   task_status: String,
@@ -28,9 +30,8 @@ const taskSchema = new mongoose.Schema({
 });
 
 const repoSchema = new mongoose.Schema({
-  _id: String,
-  repo_url: String,
-  maintainers: [String],
+  _id: String, // repo_name
+  maintainer: String,
   past_sprints: [sprintOverviewSchema],
   active_sprints: [sprintOverviewSchema],
   contributors: [repoLevelContributorSchema],
@@ -39,7 +40,7 @@ const repoSchema = new mongoose.Schema({
 const sprintSchema = new mongoose.Schema({
   repo: String,
   name: String,
-  sprint_url: String,
+  sprint_perm_id: String,
   milestone_url: String,
   contributors: [sprintLevelContributorSchema],
   tasks: [taskSchema],
@@ -50,7 +51,6 @@ const sprintSchema = new mongoose.Schema({
 });
 
 const Repo = mongoose.model("Repo", repoSchema);
-
 const Sprint = mongoose.model("Sprint", sprintSchema);
 
 module.exports = {
