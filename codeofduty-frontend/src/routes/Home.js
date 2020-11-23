@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { withCookies } from "react-cookie";
 import {
   withStyles,
   Typography,
@@ -74,35 +75,48 @@ const style = (theme) => ({
 class Home extends React.Component {
   constructor(props) {
     super(props);
+    const { cookies } = props;
     this.state = {
-      loggedInUser: "warrior",
+      loggedInUser: cookies.get("user") || "warrior",
       status: STATUS.INITIAL,
-      token: null,
+      accessToken: cookies.get("token") || null,
       createSprintModalOpen: false,
     };
   }
 
   componentDidMount() {
-    const url = window.location.href;
-    if (url.includes("?code=")) {
-      const newUrl = url.split("?code=");
-      window.history.pushState({}, null, newUrl[0]);
-      const code = newUrl[1];
-      this.setState({ status: STATUS.LOADING });
-      axios
-        .get(`http://127.0.0.1:5000/authenticate?code=${code}`)
-        .then((res) => {
-          if (res.status === 200) {
-            const { token, user } = res.data;
-            console.log(res.data);
-            this.setState({
-              token,
-              loggedInUser: user.login,
-              status: STATUS.AUTHENTICATED,
-            });
-            this.fetchUserSprints(user.login);
-          }
-        });
+    const { cookies } = this.props;
+    const { accessToken, loggedInUser } = this.state;
+    if (accessToken) {
+      if (loggedInUser !== "warrior") {
+        this.fetchUserSprints(loggedInUser);
+      }
+      this.setState({
+        status: STATUS.AUTHENTICATED,
+      });
+    } else {
+      const url = window.location.href;
+      if (url.includes("?code=")) {
+        const newUrl = url.split("?code=");
+        window.history.pushState({}, null, newUrl[0]);
+        const code = newUrl[1];
+        this.setState({ status: STATUS.LOADING });
+        axios
+          .get(`http://127.0.0.1:5000/authenticate?code=${code}`)
+          .then((res) => {
+            if (res.status === 200) {
+              const { token, user } = res.data;
+              cookies.set("token", token, { path: "/" });
+              cookies.set("user", user.login, { path: "/" });
+              this.setState({
+                accessToken: token,
+                loggedInUser: user.login,
+                status: STATUS.AUTHENTICATED,
+              });
+              this.fetchUserSprints(user.login);
+            }
+          });
+      }
     }
     this.fetchGlobalSprints();
   }
@@ -113,6 +127,17 @@ class Home extends React.Component {
 
   handleModalClose = () => {
     this.setState({ createSprintModalOpen: false });
+  };
+
+  logOut = () => {
+    const { cookies } = this.props;
+    cookies.remove("token");
+    cookies.remove("user");
+    this.setState({
+      loggedInUser: cookies.get("user") || "warrior",
+      status: STATUS.INITIAL,
+      accessToken: cookies.get("token") || null,
+    });
   };
 
   async fetchGlobalSprints() {
@@ -135,18 +160,17 @@ class Home extends React.Component {
 
   render() {
     const { classes } = this.props;
-
     const {
       loggedInUser,
       status,
       globalSprints,
       userSprints,
       createSprintModalOpen,
-      token,
+      accessToken,
     } = this.state;
     return (
       <div className={classes.root}>
-        <Header />
+        <Header logOut={accessToken ? this.logOut : null} />
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
             <Typography className={classes.sub} variant="h4" align="center">
@@ -195,7 +219,7 @@ class Home extends React.Component {
                   onClose={this.handleModalClose}
                   fullWidth
                 >
-                  <CreateSprint token={token} user={loggedInUser} />
+                  <CreateSprint token={accessToken} user={loggedInUser} />
                 </Dialog>
               </div>
             )}
@@ -206,4 +230,4 @@ class Home extends React.Component {
   }
 }
 
-export default withStyles(style)(Home);
+export default withStyles(style)(withCookies(Home));

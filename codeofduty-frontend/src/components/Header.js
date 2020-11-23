@@ -27,7 +27,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, logOut } = this.props;
 
     return (
       <div className={classes.paper}>
@@ -39,6 +39,11 @@ class Header extends React.Component {
         <Typography className={classes.sub} variant="h5" align="center">
           Gamifying Agile Sprints | Making Open Source Contributions Fun!
         </Typography>
+        {logOut ? (
+          <button type="button" onClick={logOut}>
+            Log Out
+          </button>
+        ) : null}
       </div>
     );
   }
