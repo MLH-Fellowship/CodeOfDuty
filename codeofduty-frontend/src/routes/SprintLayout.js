@@ -5,11 +5,17 @@ import Header from "../components/Header";
 import HealthBar from "../components/HealthBar";
 import ParticipantLeaderboard from "../components/ParticipantLeaderboard";
 import TaskBoard from "../components/TaskBoard";
+import RepoLayout from "./RepoLayout";
+import Genie from "../assets/genie.gif";
+import Dragon from "../assets/dragon.gif";
+import Monster from "../assets/monster.gif";
+import Elf from "../assets/elf.gif";
+import Cactus from "../assets/cactus.gif";
 
 const style = () => ({
   root: {
     height: "95vh",
-    width: "95vw",
+    width: "100vw",
   },
   menu: {
     display: "flex",
@@ -19,12 +25,30 @@ const style = () => ({
   },
   menuItem: {
     padding: "0 2.5% 0 2.5%",
+    height: "70vh",
+    overflowY: "scroll",
+    borderStyle: "none solid none solid",
+    borderWidth: "thin",
   },
   sub: {
     marginTop: 10,
     marginBottom: 10,
   },
+  inline: {
+    margin: "10px 50px auto 50px",
+    display: "inline-block",
+  },
+  boss: {
+    height: "30vh",
+    width: "auto",
+  },
 });
+
+const sprintBOSS = [Genie, Dragon, Elf, Monster, Cactus];
+
+const getSprintBOSS = () => {
+  return sprintBOSS[Math.floor(Math.random() * sprintBOSS.length)];
+};
 
 const getStakePoints = (contributors) => {
   let sum = 0;
@@ -67,33 +91,45 @@ class SprintLayout extends React.Component {
         <Header />
         {data && (
           <Grid container component="main" className={classes.menu}>
-            <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
+            <Grid item xs={4} sm={4} md={4} className={classes.menuItem}>
+              <RepoLayout owner={owner} repo={repo} />
+            </Grid>
+            <Grid item xs={8} sm={8} md={8} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">
                 <a href={data.milestone_url}>{data.name}</a>
-                {` | `}
-                <a href={`https://github.com/${owner}/${repo}`}>
-                  {`(${owner}/${repo})`}
-                </a>
               </Typography>
-              <Typography className={classes.sub} variant="h5" align="center">
-                {`Sprint Leaderboard `}
+              <HealthBar
+                maxHp={data.boss_hp_max}
+                currHp={data.boss_hp}
+                staked={getStakePoints(data.contributors)}
+              />
+              <Typography
+                className={`${classes.sub} ${classes.inline}`}
+                variant="h5"
+                align="center"
+              >
+                Sprint Leaderboard
                 <ParticipantLeaderboard
                   participantData={data.contributors.sort(
                     (a, b) => b.points_at_stake - a.points_at_stake
                   )}
                 />
               </Typography>
+              <img
+                className={`${classes.boss} ${classes.inline}`}
+                style={{
+                  opacity: `${Math.min(
+                    1.0,
+                    (5 * data.boss_hp) / (3 * data.boss_hp_max)
+                  )}`,
+                }}
+                src={getSprintBOSS()}
+                alt="Sprint Boss Graphic"
+              />
               <Typography className={classes.sub} variant="h5" align="center">
                 Sprint Task Board
                 <TaskBoard taskData={data.tasks} />
               </Typography>
-            </Grid>
-            <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
-              <HealthBar
-                maxHp={data.boss_hp_max}
-                currHp={data.boss_hp}
-                staked={getStakePoints(data.contributors)}
-              />
             </Grid>
           </Grid>
         )}
