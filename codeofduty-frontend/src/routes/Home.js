@@ -94,6 +94,7 @@ class Home extends React.Component {
         .then((res) => {
           if (res.status === 200) {
             const { token, user } = res.data;
+            console.log(res.data);
             this.setState({
               token,
               loggedInUser: user.login,

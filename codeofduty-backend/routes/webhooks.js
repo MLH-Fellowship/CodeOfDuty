@@ -7,180 +7,231 @@ const router = express.Router();
 const github = new GithubGraphQLApi({
   token: process.env.GITHUB_API_TOKEN,
 });
+const CONTRIBUTOR_PERCENTAGE = 0.85;
+// const DEFAULT_THRESHOLD = 0.8;
 
 router.route("/issue").post(async (req, res) => {
-  if (req.body.action === "milestoned") {
-    let points = 0;
-    req.body.issue.labels.forEach(async (label) => {
-      if (!label.name.NaN) {
-        points = parseInt(label.name, 10);
-        await models.Sprint.findOneAndUpdate(
-          { milestone_url: req.body.milestone.html_url },
-          { $inc: { boss_hp: points, boss_hp_max: points } },
-        );
-      }
-    });
-
-    if (req.body.issue.assignee) {
-      const assignee = req.body.issue.assignee.login;
-      const contributors = await models.Sprint.findOne({
+  // Check if issue is milestoned and has an assignee and labels
+  if (
+    req.body.action === "milestoned" &&
+    req.body.issue.assignee &&
+    req.body.issue.labels
+  ) {
+    const pointsLabel = req.body.issue.labels.find((label) =>
+      label.name.includes("points:"),
+    );
+    // check if the issue has a points label
+    if (pointsLabel) {
+      const points = pointsLabel.name.split(": ")[1];
+      // console.log(points);
+      // Check if a task has already been created
+      const taskExists = await models.Sprint.findOne({
         milestone_url: req.body.milestone.html_url,
-        "contributors.user": assignee,
+        "tasks.issue_url": req.body.issue.html_url,
+        "tasks.contributor": req.body.issue.assignee.login,
       });
-      if (contributors) {
-        await models.Sprint.findOneAndUpdate(
-          {
-            milestone_url: req.body.milestone.html_url,
-            "contributors.user": assignee,
-          },
-          { $inc: { "contributors.$.points_at_stake": 0.8 * points } },
-        );
-      } else {
-        const contributor = {
-          user: assignee,
-          points_claimed: 0,
-          points_at_stake: 0.8 * points,
+      // Do the job if its not done
+      if (!taskExists) {
+        // Create a task
+        const task = {
+          title: req.body.issue.title,
+          issue_url: req.body.issue.html_url,
+          pr_url: null,
+          task_status: "in-progress",
+          contributor: req.body.issue.assignee.login,
+          reviewer: null,
+          contributor_points: Math.round(CONTRIBUTOR_PERCENTAGE * points),
+          reviewer_points: points - Math.round(CONTRIBUTOR_PERCENTAGE * points),
         };
+        // Push the task and change the boss points
         await models.Sprint.findOneAndUpdate(
           { milestone_url: req.body.milestone.html_url },
-          { $push: { contributors: contributor } },
-        );
-      }
-      const task = {
-        issue_url: req.body.issue.html_url,
-        pr_url: null,
-        task_status: "in-progress",
-        contributor: assignee,
-        reviewer: null,
-        contributor_points: 0.8 * points,
-        reviewer_points: 0.2 * points,
-      };
-      await models.Sprint.findOneAndUpdate(
-        { milestone_url: req.body.milestone.html_url },
-        { $push: { tasks: task } },
-      );
-    } else {
-      const task = {
-        issue_url: req.body.issue.html_url,
-        pr_url: null,
-        task_status: "in-progress",
-        contributor: null,
-        reviewer: null,
-        contributor_points: 0.8 * points,
-        reviewer_points: 0.2 * points,
-      };
-      await models.Sprint.findOneAndUpdate(
-        { milestone_url: req.body.milestone.html_url },
-        { $push: { tasks: task } },
-      );
-    }
-  } else if (req.body.action === "demilestoned") {
-    let points = 0;
-    req.body.issue.labels.forEach(async (label) => {
-      if (!label.name.NaN) {
-        points = parseInt(label.name, 10);
-        await models.Sprint.findOneAndUpdate(
-          { milestone_url: req.body.milestone.html_url },
-          { $inc: { boss_hp: -points, boss_hp_max: -points } },
-        );
-      }
-    });
-    if (req.body.issue.assignee) {
-      const assignee = req.body.issue.assignee.login;
-      const contributors = await models.Sprint.findOne({
-        milestone_url: req.body.milestone.html_url,
-        "contributors.user": assignee,
-      });
-      if (contributors) {
-        await models.Sprint.findOneAndUpdate(
           {
-            milestone_url: req.body.milestone.html_url,
-            "contributors.user": assignee,
+            $inc: { boss_hp: points, boss_hp_max: points },
+            $push: { tasks: task },
           },
-          { $inc: { "contributors.$.points_at_stake": -0.8 * points } },
         );
-      } else {
-        const contributor = {
-          user: assignee,
-          points_claimed: 0,
-          points_at_stake: -0.8 * points,
-        };
-        await models.Sprint.findOneAndUpdate(
-          { milestone_url: req.body.milestone.html_url },
-          { $push: { contributors: contributor } },
-        );
+        // Check if user is in the contributor list
+        const contributors = await models.Sprint.findOne({
+          milestone_url: req.body.milestone.html_url,
+          "contributors.user": req.body.issue.assignee.login,
+        });
+        // If the user is in the contributor list, pdate the points
+        if (contributors) {
+          await models.Sprint.findOneAndUpdate(
+            {
+              milestone_url: req.body.milestone.html_url,
+              "contributors.user": req.body.issue.assignee.login,
+            },
+            {
+              $inc: {
+                "contributors.$.points_at_stake":
+                  CONTRIBUTOR_PERCENTAGE * points,
+              },
+            },
+          );
+        }
+        // If the user is a first time contributor, push the new contributor to the contributors list
+        else {
+          const contributor = {
+            user: req.body.issue.assignee.login,
+            points_claimed: 0,
+            points_at_stake: CONTRIBUTOR_PERCENTAGE * points,
+          };
+          await models.Sprint.findOneAndUpdate(
+            { milestone_url: req.body.milestone.html_url },
+            { $push: { contributors: contributor } },
+          );
+        }
       }
     }
   }
-  if (req.body.action === "assigned") {
-    if (req.body.issue.milestone) {
-      let points = 0;
-      req.body.issue.labels.forEach(async (label) => {
-        if (!label.name.NaN) {
-          points = parseInt(label.name, 10);
-        }
-      });
-      const assignee = req.body.assignee.login;
-      const contributors = await models.Sprint.findOne({
+  // Check if issue is milestoned and has an assignee and labels
+  else if (
+    req.body.action === "assigned" &&
+    req.body.issue.milestone &&
+    req.body.issue.labels
+  ) {
+    const pointsLabel = req.body.issue.labels.find((label) =>
+      label.name.includes("points:"),
+    );
+    // check if the issue has a points label
+    if (pointsLabel) {
+      // (pointsLabel);
+      const points = Number(pointsLabel.name.split(": ")[1]);
+      // console.log(points);
+      // Check if a task has already been created
+      const taskExists = await models.Sprint.findOne({
         milestone_url: req.body.issue.milestone.html_url,
-        "contributors.user": assignee,
+        "tasks.issue_url": req.body.issue.html_url,
+        "tasks.contributor": req.body.issue.assignee.login,
       });
-      if (contributors) {
-        await models.Sprint.findOneAndUpdate(
-          {
-            milestone_url: req.body.issue.milestone.html_url,
-            "contributors.user": assignee,
-          },
-          { $inc: { "contributors.$.points_at_stake": 0.8 * points } },
-        );
-      } else {
-        const contributor = {
-          user: assignee,
-          points_claimed: 0,
-          points_at_stake: 0.8 * points,
+      // Do the job if its not done
+      if (!taskExists) {
+        // Create a task
+        const task = {
+          title: req.body.issue.title,
+          issue_url: req.body.issue.html_url,
+          pr_url: null,
+          task_status: "in-progress",
+          contributor: req.body.issue.assignee.login,
+          reviewer: null,
+          contributor_points: Math.round(CONTRIBUTOR_PERCENTAGE * points),
+          reviewer_points: points - Math.round(CONTRIBUTOR_PERCENTAGE * points),
         };
+        // Push the task and change the boss points
         await models.Sprint.findOneAndUpdate(
           { milestone_url: req.body.issue.milestone.html_url },
-          { $push: { contributors: contributor } },
+          {
+            $inc: { boss_hp: points, boss_hp_max: points },
+            $push: { tasks: task },
+          },
         );
-      }
-      await models.Sprint.findOneAndUpdate(
-        {
-          milestone_url: req.body.issue.milestone.html_url,
-          "tasks.issue_url": req.body.issue.html_url,
-        },
-        { "tasks.$.contributor": assignee },
-      );
-    }
-  } else if (req.body.action === "labeled") {
-    if (req.body.issue.milestone && req.body.issue.assignee) {
-      let points = 0;
-      req.body.issue.labels.forEach(async (label) => {
-        if (!label.name.NaN) {
-          points = parseInt(label.name, 10);
-        }
-      });
-      await models.Sprint.findOneAndUpdate(
-        { milestone_url: req.body.issue.milestone.html_url },
-        { $inc: { boss_hp: points, boss_hp_max: points } },
-      );
-      await models.Sprint.findOneAndUpdate(
-        {
-          milestone_url: req.body.issue.milestone.html_url,
-          "tasks.issue_url": req.body.issue.html_url,
-        },
-        {
-          "tasks.$.contributor_points": 0.8 * points,
-          "tasks.$.reviewer_points": 0.2 * points,
-        },
-      );
-      await models.Sprint.findOneAndUpdate(
-        {
+        // Check if user is in the contributor list
+        const contributors = await models.Sprint.findOne({
           milestone_url: req.body.issue.milestone.html_url,
           "contributors.user": req.body.issue.assignee.login,
-        },
-        { $inc: { "contributors.$.points_at_stake": 0.8 * points } },
-      );
+        });
+        // If the user is in the contributor list, update the points
+        if (contributors) {
+          await models.Sprint.findOneAndUpdate(
+            {
+              milestone_url: req.body.issue.milestone.html_url,
+              "contributors.user": req.body.issue.assignee.login,
+            },
+            {
+              $inc: {
+                "contributors.$.points_at_stake":
+                  CONTRIBUTOR_PERCENTAGE * points,
+              },
+            },
+          );
+        }
+        // If the user is a first time contributor, push the new contributor to the contributors list
+        else {
+          const contributor = {
+            user: req.body.issue.assignee.login,
+            points_claimed: 0,
+            points_at_stake: CONTRIBUTOR_PERCENTAGE * points,
+          };
+          await models.Sprint.findOneAndUpdate(
+            { milestone_url: req.body.issue.milestone.html_url },
+            { $push: { contributors: contributor } },
+          );
+        }
+      }
+    }
+  } else if (
+    req.body.action === "labeled" &&
+    req.body.issue.milestone &&
+    req.body.issue.assignee
+  ) {
+    const pointsLabel = req.body.issue.labels.find((label) =>
+      label.name.includes("points:"),
+    );
+    // check if the issue has a points label
+    if (pointsLabel) {
+      const points = Number(pointsLabel.name.split(": ")[1]);
+      // Check if a task has already been created
+      const taskExists = await models.Sprint.findOne({
+        milestone_url: req.body.issue.milestone.html_url,
+        "tasks.issue_url": req.body.issue.html_url,
+        "tasks.contributor": req.body.issue.assignee.login,
+      });
+      // Do the job if its not done
+      if (!taskExists) {
+        // Create a task
+        const task = {
+          title: req.body.issue.title,
+          issue_url: req.body.issue.html_url,
+          pr_url: null,
+          task_status: "in-progress",
+          contributor: req.body.issue.assignee.login,
+          reviewer: null,
+          contributor_points: Math.round(CONTRIBUTOR_PERCENTAGE * points),
+          reviewer_points: points - Math.round(CONTRIBUTOR_PERCENTAGE * points),
+        };
+        // Push the task and change the boss points
+        await models.Sprint.findOneAndUpdate(
+          { milestone_url: req.body.issue.milestone.html_url },
+          {
+            $inc: { boss_hp: points, boss_hp_max: points },
+            $push: { tasks: task },
+          },
+        );
+        // Check if user is in the contributor list
+        const contributors = await models.Sprint.findOne({
+          milestone_url: req.body.issue.milestone.html_url,
+          "contributors.user": req.body.issue.assignee.login,
+        });
+        // If the user is in the contributor list, pdate the points
+        if (contributors) {
+          await models.Sprint.findOneAndUpdate(
+            {
+              milestone_url: req.body.issue.milestone.html_url,
+              "contributors.user": req.body.issue.assignee.login,
+            },
+            {
+              $inc: {
+                "contributors.$.points_at_stake":
+                  CONTRIBUTOR_PERCENTAGE * points,
+              },
+            },
+          );
+        }
+        // If the user is a first time contributor, push the new contributor to the contributors list
+        else {
+          const contributor = {
+            user: req.body.issue.assignee.login,
+            points_claimed: 0,
+            points_at_stake: CONTRIBUTOR_PERCENTAGE * points,
+          };
+          await models.Sprint.findOneAndUpdate(
+            { milestone_url: req.body.issue.milestone.html_url },
+            { $push: { contributors: contributor } },
+          );
+        }
+      }
     }
   }
 
@@ -216,124 +267,354 @@ router.route("/pullrequest").post(async (req, res) => {
       null,
       // eslint-disable-next-line no-unused-vars
       async (result, err) => {
-        const issueNumber = result.data.resource.timelineItems.nodes[
-          result.data.resource.timelineItems.nodes.length - 1
-        ].subject.number.toString();
-        const issueUrl = `${req.body.repository.html_url}/issues/${issueNumber}`;
-        const details = await models.Sprint.findOne({
-          "tasks.issue_url": issueUrl,
-        });
-        if (details) {
-          const prLink = req.body.pull_request.html_url;
-          let contributorPoints = 0;
-          let reviewerPoints = 0;
-          const contributor = req.body.pull_request.assignee.login;
-          const reviewer = req.body.pull_request.requested_reviewers[0].login;
-          details.tasks.forEach(async (task) => {
-            if (
-              task.issue_url === issueUrl &&
-              task.contributor === contributor
-            ) {
-              contributorPoints = task.contributor_points;
-              reviewerPoints = task.reviewer_points;
-            }
-          });
-          console.log(contributorPoints, reviewerPoints);
-          await models.Sprint.findOneAndUpdate(
-            {
-              "tasks.issue_url": issueUrl,
-              "tasks.contributor": contributor,
-            },
-            {
-              "tasks.$.pr_url": prLink,
-              "tasks.$.task_status": "Done",
-              "tasks.$.reviewer": reviewer,
-              $inc: { boss_hp: -(contributorPoints + reviewerPoints) },
-            },
-          );
-          await models.Sprint.findOneAndUpdate(
-            {
-              "tasks.issue_url": issueUrl,
-              "contributors.user": contributor,
-            },
-            {
-              "contributors.$.points_claimed": contributorPoints,
-              $inc: { "contributors.$.points_at_stake": -contributorPoints },
-            },
-          );
-          const reviewercheck = await models.Sprint.findOne({
+        if (
+          result.data.resource.timelineItems.nodes[
+            result.data.resource.timelineItems.nodes.length - 1
+          ]
+        ) {
+          console.log("Here");
+          const issueNumber = result.data.resource.timelineItems.nodes[
+            result.data.resource.timelineItems.nodes.length - 1
+          ].subject.number.toString();
+          // Fetch Issue URL
+          const issueUrl = `${req.body.repository.html_url}/issues/${issueNumber}`;
+          // Check if Reviewer Exists in DB
+          const reviewerExists = await models.Sprint.findOne({
+            "tasks.reviewer":
+              req.body.pull_request.requested_reviewers[0].login,
             "tasks.issue_url": issueUrl,
-            "contributors.user": reviewer,
           });
-          if (reviewercheck) {
+          // If Reviewer exists, subtract reviewer points at stake, add points claimed
+          if (reviewerExists) {
+            // Check if the PR is associated with a milestoned issue
+            const details = await models.Sprint.findOne({
+              "tasks.issue_url": issueUrl,
+            });
+            // If PR is associated to a milestoned issue, do the job
+            if (details) {
+              const prLink = req.body.pull_request.html_url;
+              let contributorPoints = 0;
+              let reviewerPoints = 0;
+              const contributor = req.body.pull_request.assignee.login;
+              const reviewer =
+                req.body.pull_request.requested_reviewers[0].login;
+              details.tasks.forEach(async (task) => {
+                if (
+                  task.issue_url === issueUrl &&
+                  task.contributor === contributor
+                ) {
+                  contributorPoints = task.contributor_points;
+                  reviewerPoints = task.reviewer_points;
+                }
+              });
+              // console.log(contributorPoints, reviewerPoints);
+              // Decrease boss health
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "tasks.contributor": contributor,
+                  "tasks.reviewer": reviewer,
+                },
+                {
+                  "tasks.$.pr_url": prLink,
+                  "tasks.$.task_status": "Done",
+                  $inc: { boss_hp: -(contributorPoints + reviewerPoints) },
+                },
+              );
+              // Add points claimed andsubtract points at stake for contributor
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "contributors.user": contributor,
+                },
+                {
+                  "contributors.$.points_claimed": contributorPoints,
+                  $inc: {
+                    "contributors.$.points_at_stake": -contributorPoints,
+                  },
+                },
+              );
+              // Add points claimed andsubtract points at stake for reviewer
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "contributors.user": reviewer,
+                },
+                {
+                  "contributors.$.points_claimed": reviewerPoints,
+                  $inc: { "contributors.$.points_at_stake": -reviewerPoints },
+                },
+              );
+              // Add points to repo
+              const repoName = details.repo;
+              const contributorExists = models.Repo.findOne({
+                _id: repoName,
+                "contributors.user": contributor,
+              });
+              if (contributorExists) {
+                await models.Repo.findOneAndUpdate(
+                  {
+                    _id: repoName,
+                    "contributors.user": contributor,
+                  },
+                  {
+                    $inc: {
+                      "contributors.$.points_claimed": contributorPoints,
+                    },
+                  },
+                );
+              } else {
+                const contributorObject = {
+                  user: contributor,
+                  points_claimed: contributorPoints,
+                };
+                await models.Repo.findOneAndUpdate(
+                  { _id: repoName },
+                  { $push: { contributors: contributorObject } },
+                );
+              }
+              const checkReviewer = models.Repo.findOne({
+                _id: repoName,
+                "contributors.user": reviewer,
+              });
+              if (checkReviewer) {
+                await models.Repo.findOneAndUpdate(
+                  {
+                    repo_name: repoName,
+                    "contributors.user": reviewer,
+                  },
+                  { $inc: { "contributors.$.points_claimed": reviewerPoints } },
+                );
+              } else {
+                const reviewerObject = {
+                  user: reviewer,
+                  points_claimed: reviewerPoints,
+                };
+                await models.Repo.findOneAndUpdate(
+                  { _id: repoName },
+                  { $push: { contributors: reviewerObject } },
+                );
+              }
+            }
+          } else {
+            const details = await models.Sprint.findOne({
+              "tasks.issue_url": issueUrl,
+            });
+            if (details) {
+              const prLink = req.body.pull_request.html_url;
+              let contributorPoints = 0;
+              let reviewerPoints = 0;
+              const contributor = req.body.pull_request.assignee.login;
+              const reviewer =
+                req.body.pull_request.requested_reviewers[0].login;
+              details.tasks.forEach(async (task) => {
+                if (
+                  task.issue_url === issueUrl &&
+                  task.contributor === contributor
+                ) {
+                  contributorPoints = task.contributor_points;
+                  reviewerPoints = task.reviewer_points;
+                }
+              });
+              // console.log(contributorPoints, reviewerPoints);
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "tasks.contributor": contributor,
+                },
+                {
+                  "tasks.$.pr_url": prLink,
+                  "tasks.$.task_status": "Done",
+                  "tasks.$.reviewer": reviewer,
+                  $inc: { boss_hp: -(contributorPoints + reviewerPoints) },
+                },
+              );
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "contributors.user": contributor,
+                },
+                {
+                  "contributors.$.points_claimed": contributorPoints,
+                  $inc: {
+                    "contributors.$.points_at_stake": -contributorPoints,
+                  },
+                },
+              );
+              const reviewercheck = await models.Sprint.findOne({
+                "tasks.issue_url": issueUrl,
+                "contributors.user": reviewer,
+              });
+              if (reviewercheck) {
+                await models.Sprint.findOneAndUpdate(
+                  {
+                    "tasks.issue_url": issueUrl,
+                    "contributors.user": reviewer,
+                  },
+                  { $inc: { "contributors.$.points_claimed": reviewerPoints } },
+                );
+              } else {
+                const reviewee = {
+                  user: reviewer,
+                  points_claimed: reviewerPoints,
+                  points_at_stake: 0,
+                };
+                await models.Sprint.findOneAndUpdate(
+                  { "tasks.issue_url": issueUrl },
+                  { $push: { contributors: reviewee } },
+                );
+              }
+              const repoName = details.repo;
+              const checkAssignee = models.Repo.findOne({
+                repo_name: repoName,
+                "contributors.user": contributor,
+              });
+              if (checkAssignee) {
+                await models.Repo.findOneAndUpdate(
+                  {
+                    repo_name: repoName,
+                    "contributors.user": contributor,
+                  },
+                  {
+                    $inc: {
+                      "contributors.$.points_claimed": contributorPoints,
+                    },
+                  },
+                );
+              } else {
+                const checkAssignee1 = {
+                  user: contributor,
+                  points_claimed: contributorPoints,
+                };
+                await models.Repo.findOneAndUpdate(
+                  { repo_name: repoName },
+                  { $push: { contributors: checkAssignee1 } },
+                );
+              }
+              const checkReviewer = models.Repo.findOne({
+                repo_name: repoName,
+                "contributors.user": reviewer,
+              });
+              if (checkReviewer) {
+                await models.Repo.findOneAndUpdate(
+                  {
+                    repo_name: repoName,
+                    "contributors.user": reviewer,
+                  },
+                  { $inc: { "contributors.$.points_claimed": reviewerPoints } },
+                );
+              } else {
+                const checkReviewer1 = {
+                  user: reviewer,
+                  points_claimed: reviewerPoints,
+                };
+                await models.Repo.findOneAndUpdate(
+                  { repo_name: repoName },
+                  { $push: { contributors: checkReviewer1 } },
+                );
+              }
+            }
+          }
+          res.send({
+            statusCode: 200,
+            message: "Done",
+          });
+        }
+      },
+    );
+  } else if (req.body.action === "review_requested") {
+    await github.query(
+      `
+      {
+        resource(url: "${req.body.pull_request.html_url}") {
+          ... on PullRequest {
+            timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 100) {
+              nodes {
+                ... on ConnectedEvent {
+                  id
+                  subject {
+                    ... on Issue {
+                      number
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+      null,
+      // eslint-disable-next-line no-unused-vars
+      async (result, err) => {
+        if (
+          result.data.resource.timelineItems.nodes[
+            result.data.resource.timelineItems.nodes.length - 1
+          ]
+        ) {
+          const issueNumber = result.data.resource.timelineItems.nodes[
+            result.data.resource.timelineItems.nodes.length - 1
+          ].subject.number.toString();
+          // Fetch Issue URL
+          const issueUrl = `${req.body.repository.html_url}/issues/${issueNumber}`;
+          const details = await models.Sprint.findOne({
+            "tasks.issue_url": issueUrl,
+          });
+          // If PR is associated to a milestoned issue, do the job
+          if (details) {
+            let reviewerPoints = 0;
+            const contributor = req.body.pull_request.assignee.login;
+            const reviewer = req.body.pull_request.requested_reviewers[0].login;
+            details.tasks.forEach(async (task) => {
+              if (
+                task.issue_url === issueUrl &&
+                task.contributor === contributor
+              ) {
+                reviewerPoints = task.reviewer_points;
+              }
+            });
+            // Check if user is in the contributor list
+            const contributors = await models.Sprint.findOne({
+              "tasks.issue_url": issueUrl,
+              "contributors.user": reviewer,
+            });
+            // If the user is in the contributor list, update the points
+            if (contributors) {
+              await models.Sprint.findOneAndUpdate(
+                {
+                  "tasks.issue_url": issueUrl,
+                  "contributors.user": reviewer,
+                },
+                {
+                  $inc: {
+                    "contributors.$.points_at_stake": reviewerPoints,
+                  },
+                },
+              );
+            }
+            // If the user is a first time contributor, push the new contributor to the contributors list
+            else {
+              const reviewObject = {
+                user: reviewer,
+                points_claimed: 0,
+                points_at_stake: reviewerPoints,
+              };
+              await models.Sprint.findOneAndUpdate(
+                { "tasks.issue_url": issueUrl },
+                { $push: { contributors: reviewObject } },
+              );
+            }
+            // Add the reviewer to the task object
             await models.Sprint.findOneAndUpdate(
               {
                 "tasks.issue_url": issueUrl,
-                "contributors.user": reviewer,
               },
-              { $inc: { "contributors.$.points_claimed": reviewerPoints } },
-            );
-          } else {
-            const reviewee = {
-              user: reviewer,
-              points_claimed: reviewerPoints,
-              points_at_stake: 0,
-            };
-            await models.Sprint.findOneAndUpdate(
-              { "tasks.issue_url": issueUrl },
-              { $push: { contributors: reviewee } },
-            );
-          }
-          const repoName = details.repo;
-          const checkAssignee = models.Repo.findOne({
-            repo_name: repoName,
-            "contributors.user": contributor,
-          });
-          if (checkAssignee) {
-            await models.Repo.findOneAndUpdate(
               {
-                repo_name: repoName,
-                "contributors.user": contributor,
+                "tasks.reviewer": reviewer,
               },
-              { $inc: { "contributors.$.points_claimed": contributorPoints } },
-            );
-          } else {
-            const checkAssignee1 = {
-              user: contributor,
-              points_claimed: contributorPoints,
-            };
-            await models.Repo.findOneAndUpdate(
-              { repo_name: repoName },
-              { $push: { contributors: checkAssignee1 } },
-            );
-          }
-          const checkReviewer = models.Repo.findOne({
-            repo_name: repoName,
-            "contributors.user": reviewer,
-          });
-          if (checkReviewer) {
-            await models.Repo.findOneAndUpdate(
-              {
-                repo_name: repoName,
-                "contributors.user": reviewer,
-              },
-              { $inc: { "contributors.$.points_claimed": reviewerPoints } },
-            );
-          } else {
-            const checkReviewer1 = {
-              user: reviewer,
-              points_claimed: reviewerPoints,
-            };
-            await models.Repo.findOneAndUpdate(
-              { repo_name: repoName },
-              { $push: { contributors: checkReviewer1 } },
             );
           }
         }
-        res.send({
-          statusCode: 200,
-          message: "Done",
-        });
       },
     );
   }

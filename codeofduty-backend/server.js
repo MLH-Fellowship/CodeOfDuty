@@ -5,7 +5,6 @@ const SmeeClient = require("smee-client");
 const app = require("./app");
 require("dotenv").config();
 // eslint-disable-next-line import/order
-const SmeeClient = require("smee-client");
 // Server listening on port
 const port = process.env.PORT || 5000;
 
