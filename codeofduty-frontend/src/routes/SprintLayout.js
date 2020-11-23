@@ -74,6 +74,11 @@ class SprintLayout extends React.Component {
     this.fetchSprintData();
   }
 
+  redirect(target) {
+    const { history } = this.props;
+    history.push(`/${target}`);
+  }
+
   async fetchLatestSprintId() {
     const { owner, repo } = this.state;
     axios.get(`http://localhost:5000/repo/${owner}/${repo}`).then((res) => {
@@ -94,6 +99,7 @@ class SprintLayout extends React.Component {
     const { sprintPermId } = this.state;
     if (!sprintPermId) {
       this.fetchLatestSprintId();
+      return;
     }
     axios.get(`http://localhost:5000/sprint/${sprintPermId}`).then((res) => {
       this.setState({
@@ -111,7 +117,11 @@ class SprintLayout extends React.Component {
         {data && (
           <Grid container component="main" className={classes.menu}>
             <Grid item xs={4} sm={4} md={4} className={classes.menuItem}>
-              <RepoLayout owner={owner} repo={repo} />
+              <RepoLayout
+                owner={owner}
+                repo={repo}
+                redirect={(target) => this.redirect(target)}
+              />
             </Grid>
             <Grid item xs={8} sm={8} md={8} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">

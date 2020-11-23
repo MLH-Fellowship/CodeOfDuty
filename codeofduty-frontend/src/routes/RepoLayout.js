@@ -33,7 +33,6 @@ const style = () => ({
 class RepoLayout extends React.Component {
   constructor(props) {
     super(props);
-    // eslint-disable-next-line react/destructuring-assignment
     const { owner, repo } = this.props;
     this.state = {
       owner,
@@ -45,6 +44,11 @@ class RepoLayout extends React.Component {
   componentDidMount() {
     this.fetchRepoData();
   }
+
+  handleSelectChanged = (event) => {
+    const { owner, repo, redirect } = this.props;
+    redirect(`repo/${owner}/${repo}/${event.target.value}`);
+  };
 
   async fetchRepoData() {
     const { owner, repo } = this.state;
@@ -75,6 +79,7 @@ class RepoLayout extends React.Component {
                 className={classes.select}
                 defaultValue={sprintId || data.active_sprints[0].sprint_perm_id}
                 id="grouped-select"
+                onChange={this.handleSelectChanged}
               >
                 <ListSubheader>Active Sprints</ListSubheader>
                 {data.active_sprints.map((sprint) => (
