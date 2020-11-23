@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <CssBaseline />
       <Router>
-        <Route exact path="/" component={Home} />
+        <Route exact path="/" render={(props) => <Home {...props} />} />
         <Route
           exact
           path="/repo/:owner/:repo/:sprintPermId"
