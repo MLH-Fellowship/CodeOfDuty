@@ -127,11 +127,11 @@ router.route("/create").post(async (req, res) => {
   });
 
   // Add new sprint to repo (if exists, else create a new repo)
-  Repo.findOne({ repo_name: repo }, (err, doc) => {
+  Repo.findOne({ _id: repo }, (err, doc) => {
     if (doc === null) {
       /* If repo doesn't exist */
       const newRepo = new Repo({
-        repo_name: repo,
+        _id: repo,
         maintainer: user,
         past_sprints: [],
         active_sprints: [newSprint],
@@ -144,7 +144,7 @@ router.route("/create").post(async (req, res) => {
     } else {
       /* Add sprint to active sprints if repo is present in db */
       Repo.findOneAndUpdate(
-        { repo_name: repo },
+        { _id: repo },
         {
           $push: {
             active_sprints: newSprint,
