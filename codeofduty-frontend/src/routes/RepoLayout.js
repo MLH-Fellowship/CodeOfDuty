@@ -73,7 +73,6 @@ class RepoLayout extends React.Component {
             <FormControl className={classes.formControl}>
               <Select
                 className={classes.select}
-                // eslint-disable-next-line no-underscore-dangle
                 defaultValue={sprintId || data.active_sprints[0].sprint_perm_id}
                 id="grouped-select"
               >
@@ -81,14 +80,14 @@ class RepoLayout extends React.Component {
                 {data.active_sprints.map((sprint) => (
                   // eslint-disable-next-line no-underscore-dangle
                   <MenuItem key={sprint._id} value={sprint.sprint_perm_id}>
-                    {sprint.name || sprint.sprint_name}
+                    {sprint.name}
                   </MenuItem>
                 ))}
                 <ListSubheader>Past Sprints</ListSubheader>
                 {data.past_sprints.map((sprint) => (
                   // eslint-disable-next-line no-underscore-dangle
                   <MenuItem key={sprint._id} value={sprint.sprint_perm_id}>
-                    {sprint.name || sprint.sprint_name}
+                    {sprint.name}
                   </MenuItem>
                 ))}
               </Select>

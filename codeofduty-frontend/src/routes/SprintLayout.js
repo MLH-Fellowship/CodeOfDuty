@@ -74,8 +74,27 @@ class SprintLayout extends React.Component {
     this.fetchSprintData();
   }
 
+  async fetchLatestSprintId() {
+    const { owner, repo } = this.state;
+    axios.get(`http://localhost:5000/repo/${owner}/${repo}`).then((res) => {
+      let sprintPermId = "";
+      if (res.data.active_sprints) {
+        sprintPermId = res.data.active_sprints[0].sprint_perm_id;
+      } else {
+        sprintPermId = res.data.past_sprints[0].sprint_perm_id;
+      }
+      this.setState({
+        sprintPermId,
+      });
+      this.fetchSprintData();
+    });
+  }
+
   async fetchSprintData() {
     const { sprintPermId } = this.state;
+    if (!sprintPermId) {
+      this.fetchLatestSprintId();
+    }
     axios.get(`http://localhost:5000/sprint/${sprintPermId}`).then((res) => {
       this.setState({
         data: res.data,
