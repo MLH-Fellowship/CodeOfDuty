@@ -8,7 +8,7 @@
 ### Repository 
 
 - repositories (Collection)
-    - `repo_name` - Repository ID
+    - `_id` - Repository ID
         - Type: String `"{owner}/{repo}"`
         - Example: `"MLH-Fellowship/CodeOfDuty"`
     - `maintainer` - Maintainer for a repo
@@ -98,6 +98,7 @@
             ```
             [
                 {
+                    "title": "Issue Title - Fix Something Critical",
                     "issue_url": "https://github.com/MLH-Fellowship/CodeOfDuty/issues/1",   // link to the issue on GitHub
                     "pr_url": "https://github.com/MLH-Fellowship/CodeOfDuty/pull/4",        // link to the PR that closes the issue on GitHub
                     "task_status": "under-review",  // one of ['unassigned', 'assigned', 'under-review', 'completed']

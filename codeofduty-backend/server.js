@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 const mongoose = require("mongoose");
+const SmeeClient = require("smee-client");
 const app = require("./app");
 require("dotenv").config();
 // eslint-disable-next-line import/order

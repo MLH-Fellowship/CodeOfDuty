@@ -8,6 +8,7 @@ import {
   Paper,
   TableRow,
 } from "@material-ui/core";
+import EmojiEventIcon from "@material-ui/icons/EmojiEvents";
 import React from "react";
 
 const style = {
@@ -17,7 +18,7 @@ const style = {
   },
 };
 
-class SprintsTable extends React.Component {
+class ParticipantLeaderboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -25,37 +26,33 @@ class SprintsTable extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { sprintData } = this.props;
-
+    const { participantData } = this.props;
     return (
       <TableContainer component={Paper} className={classes.table}>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Sprint Name</TableCell>
-              <TableCell align="right">Repo</TableCell>
-              <TableCell align="right">Due Date</TableCell>
-              <TableCell align="right">Contributors</TableCell>
+              <TableCell>Participant</TableCell>
+              <TableCell align="right">Points Claimed</TableCell>
+              <TableCell align="right">Points At Stake</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {sprintData &&
-              sprintData.map((sprint) => (
+            {participantData &&
+              participantData.map((participant, index) => (
                 // eslint-disable-next-line no-underscore-dangle
-                <TableRow key={sprint._id}>
+                <TableRow key={participant.user}>
                   <TableCell component="th" scope="row">
-                    <a href={`/repo/${sprint.repo}/${sprint.sprint_perm_id}`}>
-                      {sprint.name}
+                    <a href={`https://github.com/${participant.user}`}>
+                      {participant.user}
                     </a>
+                    {index === 0 && <EmojiEventIcon />}
                   </TableCell>
                   <TableCell align="right">
-                    <a href={`/repo/${sprint.repo}`}>{sprint.repo}</a>
+                    {participant.points_claimed}
                   </TableCell>
                   <TableCell align="right">
-                    {new Date(sprint.due_date).toString()}
-                  </TableCell>
-                  <TableCell align="right">
-                    {sprint.contributors.length}
+                    {participant.points_at_stake}
                   </TableCell>
                 </TableRow>
               ))}
@@ -66,4 +63,4 @@ class SprintsTable extends React.Component {
   }
 }
 
-export default withStyles(style)(SprintsTable);
+export default withStyles(style)(ParticipantLeaderboard);
