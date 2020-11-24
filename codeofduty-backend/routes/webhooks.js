@@ -65,9 +65,14 @@ router.route("/issue").post(async (req, res) => {
             },
             {
               $inc: {
+<<<<<<< HEAD
                 "contributors.$.points_at_stake": Math.round(
                   CONTRIBUTOR_PERCENTAGE * points,
                 ),
+=======
+                "contributors.$.points_at_stake":
+                  CONTRIBUTOR_PERCENTAGE * points,
+>>>>>>> df9d67fb741c38d83b9270bf5ef3fa422e98a5be
               },
             },
           );
@@ -77,7 +82,11 @@ router.route("/issue").post(async (req, res) => {
           const contributor = {
             user: req.body.issue.assignee.login,
             points_claimed: 0,
+<<<<<<< HEAD
             points_at_stake: Math.round(CONTRIBUTOR_PERCENTAGE * points),
+=======
+            points_at_stake: CONTRIBUTOR_PERCENTAGE * points,
+>>>>>>> df9d67fb741c38d83b9270bf5ef3fa422e98a5be
           };
           await models.Sprint.findOneAndUpdate(
             { milestone_url: req.body.milestone.html_url },
@@ -268,7 +277,16 @@ router.route("/pullrequest").post(async (req, res) => {
       null,
       // eslint-disable-next-line no-unused-vars
       async (result, err) => {
+<<<<<<< HEAD
         if (result.data.resource.timelineItems.nodes[0]) {
+=======
+        if (
+          result.data.resource.timelineItems.nodes[
+            result.data.resource.timelineItems.nodes.length - 1
+          ]
+        ) {
+          console.log("Here");
+>>>>>>> df9d67fb741c38d83b9270bf5ef3fa422e98a5be
           const issueNumber = result.data.resource.timelineItems.nodes[
             result.data.resource.timelineItems.nodes.length - 1
           ].subject.number.toString();
