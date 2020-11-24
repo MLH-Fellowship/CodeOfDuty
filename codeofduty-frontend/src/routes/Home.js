@@ -170,8 +170,8 @@ class Home extends React.Component {
         />
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
-            <Typography className={classes.sub} variant="h4" align="center">
-              Top Global Active Sprints 🌎
+            <Typography className={classes.sub} variant="h5" align="center">
+              🌎 Top Global Active Sprints 🌏
             </Typography>
             <SprintsTable sprintData={globalSprints} />
           </Grid>
@@ -181,10 +181,10 @@ class Home extends React.Component {
                 <div className={classes.flexbox}>
                   <Typography
                     className={classes.centerLeft}
-                    variant="h4"
+                    variant="h5"
                     align="center"
                   >
-                    Your Active Sprints
+                    🛡️ Your Active Sprints 🛡️
                   </Typography>
                   <Button
                     className={classes.floatButton}

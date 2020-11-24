@@ -29,7 +29,7 @@ class SprintsTable extends React.Component {
 
     return (
       <TableContainer component={Paper} className={classes.table}>
-        <Table aria-label="simple table">
+        <Table size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Sprint Name</TableCell>
@@ -52,7 +52,7 @@ class SprintsTable extends React.Component {
                     <a href={`/repo/${sprint.repo}`}>{sprint.repo}</a>
                   </TableCell>
                   <TableCell align="right">
-                    {new Date(sprint.due_date).toString()}
+                    {new Date(sprint.due_date).toDateString()}
                   </TableCell>
                   <TableCell align="right">
                     {sprint.contributors.length}
