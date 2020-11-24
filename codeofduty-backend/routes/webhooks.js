@@ -23,7 +23,6 @@ router.route("/issue").post(async (req, res) => {
     // check if the issue has a points label
     if (pointsLabel) {
       const points = pointsLabel.name.split(": ")[1];
-      // console.log(points);
       // Check if a task has already been created
       const taskExists = await models.Sprint.findOne({
         milestone_url: req.body.milestone.html_url,
@@ -100,7 +99,6 @@ router.route("/issue").post(async (req, res) => {
     if (pointsLabel) {
       // (pointsLabel);
       const points = Number(pointsLabel.name.split(": ")[1]);
-      // console.log(points);
       // Check if a task has already been created
       const taskExists = await models.Sprint.findOne({
         milestone_url: req.body.issue.milestone.html_url,
@@ -410,7 +408,6 @@ router.route("/pullrequest").post(async (req, res) => {
                   reviewerPoints = task.reviewer_points;
                 }
               });
-              // console.log(contributorPoints, reviewerPoints);
               await models.Sprint.findOneAndUpdate(
                 {
                   "tasks.issue_url": issueUrl,
