@@ -8,7 +8,6 @@ import {
   Paper,
   TableRow,
 } from "@material-ui/core";
-import EmojiEventIcon from "@material-ui/icons/EmojiEvents";
 import React from "react";
 
 const style = {
@@ -46,7 +45,7 @@ class ParticipantLeaderboard extends React.Component {
                     <a href={`https://github.com/${participant.user}`}>
                       {participant.user}
                     </a>
-                    {index === 0 && <EmojiEventIcon />}
+                    {index === 0 && `  🏆`}
                   </TableCell>
                   <TableCell align="right">
                     {participant.points_claimed}

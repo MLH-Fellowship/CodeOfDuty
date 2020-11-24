@@ -126,6 +126,7 @@ class SprintLayout extends React.Component {
             <Grid item xs={8} sm={8} md={8} className={classes.menuItem}>
               <Typography className={classes.sub} variant="h5" align="center">
                 <a href={data.milestone_url}>{data.name}</a>
+                {` 🗡️`}
               </Typography>
               <HealthBar
                 maxHp={data.boss_hp_max}
@@ -137,7 +138,7 @@ class SprintLayout extends React.Component {
                 variant="h5"
                 align="center"
               >
-                Sprint Leaderboard
+                🛡️ Sprint Leaderboard 🛡️
                 <ParticipantLeaderboard
                   participantData={data.contributors.sort(
                     (a, b) => b.points_at_stake - a.points_at_stake
@@ -156,7 +157,7 @@ class SprintLayout extends React.Component {
                 alt="Sprint Boss Graphic"
               />
               <Typography className={classes.sub} variant="h5" align="center">
-                Sprint Task Board
+                ⚔️ Sprint Task Board ⚔️
                 <TaskBoard taskData={data.tasks} />
               </Typography>
             </Grid>

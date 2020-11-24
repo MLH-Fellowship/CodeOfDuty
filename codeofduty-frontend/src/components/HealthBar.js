@@ -61,7 +61,8 @@ class HealthBar extends React.Component {
       <div>
         <div className={classes.healthBar}>
           <Typography className={classes.title} variant="h5" align="center">
-            Sprint Progress Bar (BOSS Health)
+            Sprint Progress 📈 (BOSS Health)
+            {claimedPercent > 60 ? `❤️` : `💔`}
           </Typography>
           <div
             className={`${classes.healthSection} ${classes.claimed}`}
