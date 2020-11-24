@@ -20,7 +20,7 @@ describe("App", () => {
   test("renders top global sprints", async () => {
     render(<App />);
     expect(
-      screen.getByText("Top Global Active Sprints 🌎")
+      screen.getByText("🌎 Top Global Active Sprints 🌏")
     ).toBeInTheDocument();
   });
 });
