@@ -51,6 +51,7 @@ function getSprintTasks(token, repo, milestone) {
           CONTRIBUTOR_PERCENTAGE * taskPoints,
         );
         return {
+          title: task.title,
           issue_url: task.html_url,
           pr_url: null,
           task_status: task.state,
@@ -123,7 +124,7 @@ router.route("/create").post(async (req, res) => {
     boss_hp: bossMaxHealth,
     boss_hp_max: bossMaxHealth,
     victory_threshold: victoryThreshold || DEFAULT_THRESHOLD,
-    due_date: Date(milestone.due_date),
+    due_date: new Date(milestone.due_date),
   });
 
   // Add new sprint to repo (if exists, else create a new repo)

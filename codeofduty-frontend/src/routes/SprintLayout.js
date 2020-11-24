@@ -110,7 +110,7 @@ class SprintLayout extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { owner, repo, data } = this.state;
+    const { owner, repo, data, sprintPermId } = this.state;
     return (
       <div className={classes.root}>
         <Header />
@@ -120,6 +120,7 @@ class SprintLayout extends React.Component {
               <RepoLayout
                 owner={owner}
                 repo={repo}
+                sprintId={sprintPermId}
                 redirect={(target) => this.redirect(target)}
               />
             </Grid>
@@ -148,10 +149,7 @@ class SprintLayout extends React.Component {
               <img
                 className={`${classes.boss} ${classes.inline}`}
                 style={{
-                  opacity: `${Math.min(
-                    1.0,
-                    (5 * data.boss_hp) / (3 * data.boss_hp_max)
-                  )}`,
+                  opacity: `${data.boss_hp / data.boss_hp_max}`,
                 }}
                 src={getSprintBOSS()}
                 alt="Sprint Boss Graphic"

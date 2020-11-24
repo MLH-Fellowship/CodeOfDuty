@@ -65,9 +65,13 @@ class TaskBoard extends React.Component {
                   </TableCell>
                   <TableCell align="right">{task.reviewer_points}</TableCell>
                   <TableCell align="right">
-                    <a href={`https://github.com/${task.pr_url}`}>
-                      <GitHubIcon />
-                    </a>
+                    {task.pr_url ? (
+                      <a href={task.pr_url}>
+                        <GitHubIcon />
+                      </a>
+                    ) : (
+                      <div>-</div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

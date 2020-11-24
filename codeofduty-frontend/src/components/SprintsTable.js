@@ -23,6 +23,12 @@ class SprintsTable extends React.Component {
     this.state = {};
   }
 
+  getSortedData() {
+    const { sprintData } = this.props;
+    sprintData.sort((a, b) => b.points_claimed - a.points_claimed);
+    return sprintData;
+  }
+
   render() {
     const { classes } = this.props;
     const { sprintData } = this.props;
@@ -40,7 +46,7 @@ class SprintsTable extends React.Component {
           </TableHead>
           <TableBody>
             {sprintData &&
-              sprintData.map((sprint) => (
+              this.getSortedData().map((sprint) => (
                 // eslint-disable-next-line no-underscore-dangle
                 <TableRow key={sprint._id}>
                   <TableCell component="th" scope="row">
