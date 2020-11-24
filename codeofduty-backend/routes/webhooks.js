@@ -64,8 +64,9 @@ router.route("/issue").post(async (req, res) => {
             },
             {
               $inc: {
-                "contributors.$.points_at_stake":
+                "contributors.$.points_at_stake": Math.round(
                   CONTRIBUTOR_PERCENTAGE * points,
+                ),
               },
             },
           );
@@ -75,7 +76,7 @@ router.route("/issue").post(async (req, res) => {
           const contributor = {
             user: req.body.issue.assignee.login,
             points_claimed: 0,
-            points_at_stake: CONTRIBUTOR_PERCENTAGE * points,
+            points_at_stake: Math.round(CONTRIBUTOR_PERCENTAGE * points),
           };
           await models.Sprint.findOneAndUpdate(
             { milestone_url: req.body.milestone.html_url },
@@ -265,11 +266,7 @@ router.route("/pullrequest").post(async (req, res) => {
       null,
       // eslint-disable-next-line no-unused-vars
       async (result, err) => {
-        if (
-          result.data.resource.timelineItems.nodes[
-            result.data.resource.timelineItems.nodes.length - 1
-          ]
-        ) {
+        if (result.data.resource.timelineItems.nodes[0]) {
           const issueNumber = result.data.resource.timelineItems.nodes[
             result.data.resource.timelineItems.nodes.length - 1
           ].subject.number.toString();
@@ -295,6 +292,8 @@ router.route("/pullrequest").post(async (req, res) => {
               const contributor = req.body.pull_request.assignee.login;
               const reviewer =
                 req.body.pull_request.requested_reviewers[0].login;
+              // eslint-disable-next-line camelcase
+              const { milestone_url } = details;
               details.tasks.forEach(async (task) => {
                 if (
                   task.issue_url === issueUrl &&
@@ -308,8 +307,6 @@ router.route("/pullrequest").post(async (req, res) => {
               await models.Sprint.findOneAndUpdate(
                 {
                   "tasks.issue_url": issueUrl,
-                  "tasks.contributor": contributor,
-                  "tasks.reviewer": reviewer,
                 },
                 {
                   "tasks.$.pr_url": prLink,
@@ -320,12 +317,12 @@ router.route("/pullrequest").post(async (req, res) => {
               // Add points claimed andsubtract points at stake for contributor
               await models.Sprint.findOneAndUpdate(
                 {
-                  "tasks.issue_url": issueUrl,
+                  milestone_url,
                   "contributors.user": contributor,
                 },
                 {
-                  "contributors.$.points_claimed": contributorPoints,
                   $inc: {
+                    "contributors.$.points_claimed": contributorPoints,
                     "contributors.$.points_at_stake": -contributorPoints,
                   },
                 },
@@ -333,20 +330,22 @@ router.route("/pullrequest").post(async (req, res) => {
               // Add points claimed andsubtract points at stake for reviewer
               await models.Sprint.findOneAndUpdate(
                 {
-                  "tasks.issue_url": issueUrl,
+                  milestone_url,
                   "contributors.user": reviewer,
                 },
                 {
-                  "contributors.$.points_claimed": reviewerPoints,
-                  $inc: { "contributors.$.points_at_stake": -reviewerPoints },
+                  $inc: {
+                    "contributors.$.points_claimed": reviewerPoints,
+                    "contributors.$.points_at_stake": -reviewerPoints,
+                  },
                 },
               );
               // Add points to repo
               const repoName = details.repo;
-              const contributorExists = models.Repo.findOne({
+              const contributorExists = await models.Repo.findOne({
                 _id: repoName,
                 "contributors.user": contributor,
-              });
+              }).exec();
               if (contributorExists) {
                 await models.Repo.findOneAndUpdate(
                   {
@@ -369,7 +368,7 @@ router.route("/pullrequest").post(async (req, res) => {
                   { $push: { contributors: contributorObject } },
                 );
               }
-              const checkReviewer = models.Repo.findOne({
+              const checkReviewer = await models.Repo.findOne({
                 _id: repoName,
                 "contributors.user": reviewer,
               });
@@ -404,10 +403,7 @@ router.route("/pullrequest").post(async (req, res) => {
               const reviewer =
                 req.body.pull_request.requested_reviewers[0].login;
               details.tasks.forEach(async (task) => {
-                if (
-                  task.issue_url === issueUrl &&
-                  task.contributor === contributor
-                ) {
+                if (task.issue_url === issueUrl) {
                   contributorPoints = task.contributor_points;
                   reviewerPoints = task.reviewer_points;
                 }
@@ -415,7 +411,6 @@ router.route("/pullrequest").post(async (req, res) => {
               await models.Sprint.findOneAndUpdate(
                 {
                   "tasks.issue_url": issueUrl,
-                  "tasks.contributor": contributor,
                 },
                 {
                   "tasks.$.pr_url": prLink,
@@ -430,8 +425,8 @@ router.route("/pullrequest").post(async (req, res) => {
                   "contributors.user": contributor,
                 },
                 {
-                  "contributors.$.points_claimed": contributorPoints,
                   $inc: {
+                    "contributors.$.points_claimed": contributorPoints,
                     "contributors.$.points_at_stake": -contributorPoints,
                   },
                 },
@@ -460,14 +455,14 @@ router.route("/pullrequest").post(async (req, res) => {
                 );
               }
               const repoName = details.repo;
-              const checkAssignee = models.Repo.findOne({
-                repo_name: repoName,
+              const checkAssignee = await models.Repo.findOne({
+                _id: repoName,
                 "contributors.user": contributor,
               });
               if (checkAssignee) {
                 await models.Repo.findOneAndUpdate(
                   {
-                    repo_name: repoName,
+                    _id: repoName,
                     "contributors.user": contributor,
                   },
                   {
@@ -482,18 +477,18 @@ router.route("/pullrequest").post(async (req, res) => {
                   points_claimed: contributorPoints,
                 };
                 await models.Repo.findOneAndUpdate(
-                  { repo_name: repoName },
+                  { _id: repoName },
                   { $push: { contributors: checkAssignee1 } },
                 );
               }
-              const checkReviewer = models.Repo.findOne({
-                repo_name: repoName,
+              const checkReviewer = await models.Repo.findOne({
+                _id: repoName,
                 "contributors.user": reviewer,
               });
               if (checkReviewer) {
                 await models.Repo.findOneAndUpdate(
                   {
-                    repo_name: repoName,
+                    _id: repoName,
                     "contributors.user": reviewer,
                   },
                   { $inc: { "contributors.$.points_claimed": reviewerPoints } },
@@ -504,7 +499,7 @@ router.route("/pullrequest").post(async (req, res) => {
                   points_claimed: reviewerPoints,
                 };
                 await models.Repo.findOneAndUpdate(
-                  { repo_name: repoName },
+                  { _id: repoName },
                   { $push: { contributors: checkReviewer1 } },
                 );
               }
@@ -557,27 +552,25 @@ router.route("/pullrequest").post(async (req, res) => {
           });
           // If PR is associated to a milestoned issue, do the job
           if (details) {
+            // eslint-disable-next-line camelcase
+            const { milestone_url } = details;
             let reviewerPoints = 0;
-            const contributor = req.body.pull_request.assignee.login;
             const reviewer = req.body.pull_request.requested_reviewers[0].login;
             details.tasks.forEach(async (task) => {
-              if (
-                task.issue_url === issueUrl &&
-                task.contributor === contributor
-              ) {
+              if (task.issue_url === issueUrl) {
                 reviewerPoints = task.reviewer_points;
               }
             });
             // Check if user is in the contributor list
             const contributors = await models.Sprint.findOne({
-              "tasks.issue_url": issueUrl,
+              milestone_url,
               "contributors.user": reviewer,
             });
             // If the user is in the contributor list, update the points
             if (contributors) {
               await models.Sprint.findOneAndUpdate(
                 {
-                  "tasks.issue_url": issueUrl,
+                  milestone_url,
                   "contributors.user": reviewer,
                 },
                 {
@@ -605,7 +598,7 @@ router.route("/pullrequest").post(async (req, res) => {
                 "tasks.issue_url": issueUrl,
               },
               {
-                "tasks.reviewer": reviewer,
+                "tasks.$.reviewer": reviewer,
               },
             );
           }
