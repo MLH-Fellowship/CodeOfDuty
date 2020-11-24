@@ -1,7 +1,7 @@
 import { Typography, withStyles } from "@material-ui/core";
 import React from "react";
 
-const style = (theme) => ({
+const style = () => ({
   header: {
     marginTop: 20,
     marginBottom: 20,
@@ -12,11 +12,11 @@ const style = (theme) => ({
     marginBottom: 10,
   },
   paper: {
-    margin: theme.spacing(2, 4),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     width: "100%",
+    height: "30%",
   },
 });
 
