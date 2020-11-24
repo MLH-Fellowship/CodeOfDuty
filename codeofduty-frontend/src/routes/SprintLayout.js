@@ -25,7 +25,7 @@ const style = () => ({
   },
   menuItem: {
     padding: "0 2.5% 0 2.5%",
-    height: "70vh",
+    height: "85vh",
     overflowY: "scroll",
     borderStyle: "none solid none solid",
     borderWidth: "thin",

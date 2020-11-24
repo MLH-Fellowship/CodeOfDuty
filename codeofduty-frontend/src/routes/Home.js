@@ -8,7 +8,6 @@ import {
   Button,
   Dialog,
 } from "@material-ui/core";
-import GitHubIcon from "@material-ui/icons/GitHub";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import Header from "../components/Header";
 import SprintsTable from "../components/SprintsTable";
@@ -27,7 +26,6 @@ const style = (theme) => ({
   },
   header: {
     marginTop: 20,
-    marginBottom: 20,
     marginRight: 10,
     display: "inline-block",
   },
@@ -35,7 +33,7 @@ const style = (theme) => ({
     marginBottom: 10,
   },
   centerLeft: {
-    marginLeft: "20%",
+    marginLeft: "10%",
   },
   floatButton: {
     marginRight: 0,
@@ -61,10 +59,6 @@ const style = (theme) => ({
   flexbox: {
     display: "flex",
     flexDirection: "row",
-  },
-  buttonLogin: {
-    marginTop: 20,
-    textTransform: "none",
   },
   permalink: {
     cursor: "pointer",
@@ -170,35 +164,24 @@ class Home extends React.Component {
     } = this.state;
     return (
       <div className={classes.root}>
-        <Header logOut={accessToken ? this.logOut : null} />
+        <Header
+          loggedInUser={loggedInUser}
+          logOut={accessToken ? this.logOut : null}
+        />
         <Grid container component="main" className={classes.menu}>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
             <Typography className={classes.sub} variant="h4" align="center">
-              Top Global Active Sprints
+              Top Global Active Sprints 🌎
             </Typography>
             <SprintsTable sprintData={globalSprints} />
           </Grid>
           <Grid item xs={6} sm={6} md={6} className={classes.menuItem}>
-            <Typography className={classes.sub} variant="h4" align="center">
-              {`Welcome, ${loggedInUser}!`}
-            </Typography>
-            {status !== STATUS.AUTHENTICATED && (
-              <Button
-                className={classes.buttonLogin}
-                variant="contained"
-                color="primary"
-                startIcon={<GitHubIcon />}
-                href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}
-              >
-                Login with GitHub
-              </Button>
-            )}
             {status === STATUS.AUTHENTICATED && (
               <div>
                 <div className={classes.flexbox}>
                   <Typography
                     className={classes.centerLeft}
-                    variant="h5"
+                    variant="h4"
                     align="center"
                   >
                     Your Active Sprints
@@ -206,11 +189,11 @@ class Home extends React.Component {
                   <Button
                     className={classes.floatButton}
                     variant="contained"
-                    color="primary"
+                    style={{ background: "#2E3B55", color: "white" }}
                     startIcon={<AddCircleIcon />}
                     onClick={this.handleModalOpen}
                   >
-                    Create New Sprint
+                    Create Sprint
                   </Button>
                 </div>
                 <SprintsTable sprintData={userSprints} />

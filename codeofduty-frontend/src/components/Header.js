@@ -1,10 +1,17 @@
-import { Typography, withStyles } from "@material-ui/core";
+import {
+  Typography,
+  withStyles,
+  AppBar,
+  Toolbar,
+  Button,
+} from "@material-ui/core";
 import React from "react";
+import GitHubIcon from "@material-ui/icons/GitHub";
+import Logo from "../assets/codeofduty-logo.png";
 
 const style = () => ({
   header: {
     marginTop: 20,
-    marginBottom: 20,
     marginRight: 10,
     display: "inline-block",
   },
@@ -16,7 +23,15 @@ const style = () => ({
     flexDirection: "column",
     alignItems: "center",
     width: "100%",
-    height: "30%",
+    height: "15%",
+  },
+  items: {
+    display: "inline-block",
+    marginRight: "20px",
+  },
+  rightAlign: {
+    position: "absolute",
+    right: "0px",
   },
 });
 
@@ -27,23 +42,40 @@ class Header extends React.Component {
   }
 
   render() {
-    const { classes, logOut } = this.props;
+    const { classes, loggedInUser, logOut } = this.props;
 
     return (
       <div className={classes.paper}>
-        <span>
-          <Typography className={classes.header} variant="h2" center="center">
-            Code Of Duty
-          </Typography>
-        </span>
-        <Typography className={classes.sub} variant="h5" align="center">
-          Gamifying Agile Sprints | Making Open Source Contributions Fun!
-        </Typography>
-        {logOut ? (
-          <button type="button" onClick={logOut}>
-            Log Out
-          </button>
-        ) : null}
+        <AppBar position="fixed" style={{ background: "#2E3B55" }}>
+          <Toolbar>
+            <a href="http://localhost:3000/">
+              <img src={Logo} alt="logo" width="300" aria-label="logo" />
+            </a>
+            <div className={classes.rightAlign}>
+              <Typography className={classes.items} variant="h5" align="center">
+                {`Welcome, ${loggedInUser}!`}
+              </Typography>
+              {logOut ? (
+                <Button
+                  className={classes.items}
+                  variant="contained"
+                  onClick={logOut}
+                >
+                  Log Out
+                </Button>
+              ) : (
+                <Button
+                  className={classes.items}
+                  variant="contained"
+                  startIcon={<GitHubIcon />}
+                  href={`https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_OAUTH_CLIENT_ID}&scope=${process.env.REACT_APP_OAUTH_SCOPES}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}`}
+                >
+                  Login with GitHub
+                </Button>
+              )}
+            </div>
+          </Toolbar>
+        </AppBar>
       </div>
     );
   }
