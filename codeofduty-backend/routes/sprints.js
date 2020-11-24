@@ -124,7 +124,7 @@ router.route("/create").post(async (req, res) => {
     boss_hp: bossMaxHealth,
     boss_hp_max: bossMaxHealth,
     victory_threshold: victoryThreshold || DEFAULT_THRESHOLD,
-    due_date: new Date(milestone.due_date),
+    due_date: milestone.dueDate,
   });
 
   // Add new sprint to repo (if exists, else create a new repo)
@@ -137,6 +137,7 @@ router.route("/create").post(async (req, res) => {
         past_sprints: [],
         active_sprints: [newSprint],
         contributors: [],
+        due_date: milestone.dueDate,
       });
       newRepo.save().then(() => {
         console.log(`Repo ${repo} added to the db`);
