@@ -6,6 +6,7 @@ import {
   Button,
 } from "@material-ui/core";
 import React from "react";
+import { withCookies } from "react-cookie";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import Logo from "../assets/codeofduty-logo.png";
 
@@ -38,11 +39,24 @@ const style = () => ({
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    const { cookies } = this.props;
+    this.state = {
+      loggedInUserState: cookies.get("user") || "warrior",
+    };
   }
+
+  logOutHeader = () => {
+    const { cookies } = this.props;
+    cookies.remove("token");
+    cookies.remove("user");
+    this.setState({
+      loggedInUserState: "warrior",
+    });
+  };
 
   render() {
     const { classes, loggedInUser, logOut } = this.props;
+    const { loggedInUserState } = this.state;
 
     return (
       <div className={classes.paper}>
@@ -53,13 +67,13 @@ class Header extends React.Component {
             </a>
             <div className={classes.rightAlign}>
               <Typography className={classes.items} variant="h5" align="center">
-                {`Welcome, ${loggedInUser}!`}
+                {`Welcome, ${loggedInUser || loggedInUserState}!`}
               </Typography>
-              {logOut ? (
+              {logOut || loggedInUserState !== "warrior" ? (
                 <Button
                   className={classes.items}
                   variant="contained"
-                  onClick={logOut}
+                  onClick={logOut || this.logOutHeader}
                 >
                   Log Out
                 </Button>
@@ -81,4 +95,4 @@ class Header extends React.Component {
   }
 }
 
-export default withStyles(style)(Header);
+export default withStyles(style)(withCookies(Header));

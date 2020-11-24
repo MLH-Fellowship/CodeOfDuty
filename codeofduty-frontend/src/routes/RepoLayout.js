@@ -13,7 +13,7 @@ import RepoLeaderBoard from "../components/RepoLeaderBoard";
 const style = () => ({
   root: {
     height: "95%",
-    width: "95%",
+    width: "100%",
   },
   sub: {
     display: "inline-block",
@@ -22,11 +22,11 @@ const style = () => ({
   formControl: {
     display: "inline-block",
     margin: "20px auto auto auto",
-    width: "80%",
+    width: "50%",
   },
   select: {
     width: "80%",
-    textAlign: "left",
+    textAlign: "right",
   },
 });
 
@@ -72,7 +72,7 @@ class RepoLayout extends React.Component {
         {data && (
           <div>
             <Typography className={classes.sub} variant="h6" align="center">
-              Sprint
+              Sprint 🗡️
             </Typography>
             <FormControl className={classes.formControl}>
               <Select
@@ -98,7 +98,7 @@ class RepoLayout extends React.Component {
               </Select>
             </FormControl>
             <Typography className={classes.sub} variant="h6" align="center">
-              Repo Leaderboard
+              🛡️ Repo Leaderboard 🛡️
             </Typography>
             <RepoLeaderBoard participantData={data.contributors} />
           </div>

@@ -66,13 +66,15 @@ app.get("/authenticate", async (req, res) => {
 
 app.get("/fetchUserSprints", (req, res) => {
   const { user } = req.query;
-  models.Sprint.find({ "contributors.user": user })
+  const date = new Date();
+  models.Sprint.find({ "contributors.user": user, due_date: { $gte: date } })
     .sort({ due_date: "desc" })
     .exec((err, docs) => res.send(docs));
 });
 
 app.get("/fetchGlobalSprints", (req, res) => {
-  models.Sprint.find()
+  const date = new Date();
+  models.Sprint.find({ due_date: { $gte: date } })
     .sort({ due_date: "desc" })
     .limit(10)
     .exec((err, docs) => res.send(docs));
